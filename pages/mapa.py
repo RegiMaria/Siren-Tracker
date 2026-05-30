@@ -31,4 +31,30 @@ def run():
 
     aba1, aba2 = st.tabs(["🗺️ Mapa de atividade", "🧭 Mapa de probabilidade"])
 
+    with aba1:
+        col_f, col_i = st.columns([3, 1])
+        with col_f:
+            if "filtro_risco" not in st.session_state:
+                st.session_state.filtro_risco = ["alto", "medio", "baixo"]
+            filtro = st.multiselect(
+                "Filtrar por risco",
+                options=["alto", "medio", "baixo"],
+                default=st.session_state.filtro_risco,
+                format_func=lambda x: LABELS[x],
+                key="filtro_risco",
+            )
+        filtradas = [s for s in sereias if s["risco"] in filtro]
+        with col_i:
+            st.metric("Sereias visíveis", len(filtradas))
+
+        mapa = folium.Map(location=[-15.0, -35.0], zoom_start=4, tiles="CartoDB positron")
+        folium.TileLayer(
+            tiles="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",
+            name="Rotas náuticas", attr="© OpenSeaMap",
+            overlay=True, control=True, opacity=0.7,
+        ).add_to(mapa)
+        folium.LayerControl(position="topright").add_to(mapa)
+
+        st_folium(mapa, width="100%", height=460, returned_objects=[])
+
     st.markdown("</div>", unsafe_allow_html=True)
