@@ -221,7 +221,10 @@ def topbar(pagina_ativa="dashboard"):
         ("routes",       "🧭 Rotas"),
         ("reports",      "📋 Relatórios"),
     ]
+
     st.markdown(STYLE, unsafe_allow_html=True)
+
+    # topbar visual com brand + placeholder nav + sign in/up
     st.markdown(f"""
     <div class="topbar">
       <div class="brand">
@@ -229,21 +232,60 @@ def topbar(pagina_ativa="dashboard"):
         Siren Tracker
         <span class="brand-sub">NAVAL INTELLIGENCE v2.4</span>
       </div>
+      <div id="nav-placeholder"></div>
+      <div style="display:flex;align-items:center;gap:10px;flex-shrink:0">
+        <button style="padding:7px 16px;border:1px solid var(--border);border-radius:8px;background:transparent;font-size:13px;font-weight:500;color:var(--text-muted);cursor:pointer;font-family:var(--font)">Sign In</button>
+        <button class="btn-cad">Sign Up</button>
+      </div>
     </div>
     <style>
-    [data-testid="baseButton-secondary"]{{
-        background:transparent!important;border:none!important;
-        box-shadow:none!important;padding:6px 11px!important;
-        border-radius:8px!important;font-size:13px!important;
-        font-weight:500!important;color:#606060!important;
-        white-space:nowrap!important;
+    /* remove padding/margin dos botões streamlit na nav */
+    div[data-testid="stHorizontalBlock"] {{
+        gap: 0 !important;
+        background: var(--surface);
+        border-bottom: 1px solid var(--border);
+        padding: 6px 28px !important;
+        margin-top: -4px !important;
     }}
-    [data-testid="baseButton-secondary"]:hover{{background:#F2F5FA!important;color:#0B3954!important}}
-    [data-testid="baseButton-secondary"]:focus{{box-shadow:none!important;outline:none!important}}
-    .nav-ativo [data-testid="baseButton-secondary"]{{background:#EEF2FF!important;color:#4379EE!important}}
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"] {{
+        padding: 0 !important;
+        flex: 0 0 auto !important;
+        width: auto !important;
+        min-width: 0 !important;
+    }}
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"] {{
+        background: transparent !important;
+        border: none !important;
+        box-shadow: none !important;
+        padding: 6px 11px !important;
+        border-radius: 8px !important;
+        font-size: 13px !important;
+        font-weight: 500 !important;
+        color: #606060 !important;
+        white-space: nowrap !important;
+        width: auto !important;
+    }}
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"]:hover {{
+        background: #F2F5FA !important;
+        color: #0B3954 !important;
+    }}
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"]:focus {{
+        box-shadow: none !important;
+        outline: none !important;
+    }}
+    .nav-ativo [data-testid="baseButton-secondary"] {{
+        background: #EEF2FF !important;
+        color: #4379EE !important;
+    }}
+    /* esconde label "None" que aparece */
+    div[data-testid="stHorizontalBlock"] .stMarkdown p {{
+        display: none !important;
+    }}
     </style>
     """, unsafe_allow_html=True)
-    cols = st.columns(len(PAGES) + 2)
+
+    # botões de navegação em linha única
+    cols = st.columns([1,1,1,1,1,1,1,1], gap="small")
     for i, (key, label) in enumerate(PAGES):
         with cols[i]:
             ativo = key == pagina_ativa
@@ -254,9 +296,9 @@ def topbar(pagina_ativa="dashboard"):
                 st.rerun()
             if ativo:
                 st.markdown("</div>", unsafe_allow_html=True)
-    with cols[len(PAGES)]:
+    with cols[6]:
         st.button("🔒 Detector", key="_nav_locked_1", disabled=True)
-    with cols[len(PAGES)+1]:
+    with cols[7]:
         st.button("🔒 Avistamentos", key="_nav_locked_2", disabled=True)
 
 
