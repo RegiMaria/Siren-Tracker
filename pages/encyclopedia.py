@@ -20,4 +20,31 @@ def run():
         format_func=lambda x: "-- Escolha uma espécie --" if x == "" else f"{next((s['emoji'] for s in sereias if s['especie']==x),'')}{x}",
     )
 
+    if especie_sel:
+        s = next((x for x in sereias if x["especie"] == especie_sel), None)
+        if s:
+            cor = s["color"]
+            bg  = s["bg"]
+            pct = s["ameaca_pct"]
+            rc  = s["risco_class"]
+            st.markdown(f"""
+            <div class="card" style="margin-bottom:20px">
+              <div style="padding:22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:18px;background:{bg}">
+                <div style="width:90px;height:90px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;background:{cor}22;border:2px solid {cor}33;flex-shrink:0">{s['emoji']}</div>
+                <div style="flex:1">
+                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                    <h2 style="font-size:22px;font-weight:700;color:var(--text-primary)">{s['especie']}</h2>
+                    <span class="risk-badge {rc}">{s['risco_label']}</span>
+                  </div>
+                  <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">{s['habitat']}</div>
+                  <span class="chip">Profundidade: {s['profundidade']}</span>
+                  <span class="chip">Freq.: {s['freq']}</span>
+                  <div style="margin-top:8px">
+                    <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">NÍVEL DE AMEAÇA</div>
+                    <div class="threat-meter"><div class="threat-fill" style="width:{pct}%;background:{cor}"></div></div>
+                  </div>
+                </div>
+              </div>
+            </div>""", unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
