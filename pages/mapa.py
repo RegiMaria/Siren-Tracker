@@ -34,12 +34,10 @@ def run():
     with aba1:
         col_f, col_i = st.columns([3, 1])
         with col_f:
-            if "filtro_risco" not in st.session_state:
-                st.session_state.filtro_risco = ["alto", "medio", "baixo"]
             filtro = st.multiselect(
                 "Filtrar por risco",
                 options=["alto", "medio", "baixo"],
-                default=st.session_state.filtro_risco,
+                default=["alto", "medio", "baixo"],
                 format_func=lambda x: LABELS[x],
                 key="filtro_risco",
             )
@@ -47,7 +45,10 @@ def run():
         with col_i:
             st.metric("Sereias visíveis", len(filtradas))
 
-        mapa = folium.Map(location=[-15.0, -35.0], zoom_start=4, tiles="CartoDB positron")
+        coords = [[s["latitude"], s["longitude"]] for s in sereias]
+        mapa = folium.Map(location=[-15.0, -40.0], zoom_start=5, tiles="CartoDB positron")
+        if coords:
+            mapa.fit_bounds(coords, padding=(30, 30))
         folium.TileLayer(
             tiles="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",
             name="Rotas náuticas", attr="© OpenSeaMap",
@@ -57,14 +58,14 @@ def run():
 
         heat_data = [[s["latitude"], s["longitude"], s["avistamentos"]] for s in filtradas]
         if heat_data:
-            HeatMap(heat_data, radius=40, blur=25, min_opacity=0.3).add_to(mapa)
+            HeatMap(heat_data, radius=35, blur=20, min_opacity=0.2).add_to(mapa)
 
         for s in filtradas:
             folium.CircleMarker(
                 location=[s["latitude"], s["longitude"]],
-                radius=10, color="white", weight=2,
-                fill=True, fill_color=CORES[s["risco"]], fill_opacity=0.9,
-                tooltip=f"{s['nome']} ({s['especie']}) — clique para ver ficha",
+                radius=14, color="white", weight=2.5,
+                fill=True, fill_color=CORES[s["risco"]], fill_opacity=0.95,
+                tooltip=f"{s['nome']} ({s['especie']}) — {LABELS[s['risco']]}",
             ).add_to(mapa)
 
         saida = st_folium(mapa, width="100%", height=460,
