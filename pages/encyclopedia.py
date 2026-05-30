@@ -23,7 +23,7 @@ def run():
         s = sel
         cor, bg, pct, rc = s["color"], s["bg"], s["ameaca_pct"], s["risco_class"]
 
-        _, col_fechar = st.columns([8, 1])
+        _, col_fechar = st.columns([15, 1])
         with col_fechar:
             if st.button("× Fechar", use_container_width=True):
                 del st.query_params["enc"]
@@ -71,9 +71,7 @@ def run():
               <div class="spec-lore" style="font-size:14px;line-height:1.8">{s['lore']}</div>
             </div>
           </div>
-        </div>
         </div>""", unsafe_allow_html=True)
-        return
 
     # ── grid de cards clicáveis ───────────────────────────────────────────────
     cols = st.columns(3)
