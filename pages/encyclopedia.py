@@ -23,9 +23,9 @@ def run():
         s = sel
         cor, bg, pct, rc = s["color"], s["bg"], s["ameaca_pct"], s["risco_class"]
 
-        _, col_fechar = st.columns([10, 1])
+        _, col_fechar = st.columns([8, 1])
         with col_fechar:
-            if st.button("× Fechar"):
+            if st.button("× Fechar", use_container_width=True):
                 del st.query_params["enc"]
                 st.rerun()
 
