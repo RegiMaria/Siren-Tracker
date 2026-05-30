@@ -44,7 +44,8 @@ def run():
                     <div class="threat-meter"><div class="threat-fill" style="width:{pct}%;background:{cor}"></div></div>
                   </div>
                 </div>
-                <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
+              </div>
+              <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
                 <div>
                   <div class="spec-section-title">Biologia e Comportamento</div>
                   <div class="spec-field"><span class="spec-field-key">Alimentação</span><span class="spec-field-val">{s['alimentacao']}</span></div>
@@ -67,7 +68,8 @@ def run():
                   <div class="spec-lore">{s['lore']}</div>
                 </div>
               </div>
-            </div>""", unsafe_allow_html=True)
+            </div>
+          </div>""", unsafe_allow_html=True)
 
     st.markdown('<div class="enc-grid">', unsafe_allow_html=True)
     for s in sereias:

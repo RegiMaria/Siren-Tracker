@@ -15,10 +15,10 @@ STYLE = """
 }
 html,body,[class*="css"]{font-family:var(--font)!important}
 #MainMenu,footer,header,[data-testid="stToolbar"]{visibility:hidden}
-.block-container{padding:0!important;max-width:100%!important}
+.block-container{padding:0 32px!important;max-width:100%!important}
 [data-testid="stSidebar"]{display:none!important}
 
-.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 28px;position:sticky;top:0;z-index:100}
+.topbar{background:var(--surface);border-bottom:1px solid var(--border);height:64px;display:flex;align-items:center;justify-content:space-between;padding:0 60px;position:sticky;top:0;z-index:100;margin-left:-32px;margin-right:-32px}
 .brand{display:flex;align-items:center;gap:10px;font-size:17px;font-weight:500;color:var(--text-primary)}
 .brand-sub{font-size:10px;font-family:var(--mono);color:var(--text-muted);margin-left:4px;opacity:.7}
 .nav{display:flex;gap:2px}
