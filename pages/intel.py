@@ -38,4 +38,16 @@ def run():
           </div>
         </div>""", unsafe_allow_html=True)
 
+        st.markdown("""
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px">
+          <span class="section-label">Densidade de Naufrágios</span>
+          <div style="display:flex;flex-direction:column;gap:7px;font-size:12px">
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Atlântico Norte</span><span style="font-weight:600">847</span></div><div class="env-bar"><div class="env-bar-fill" style="width:90%;background:#A43955"></div></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Mediterrâneo</span><span style="font-weight:600">562</span></div><div class="env-bar"><div class="env-bar-fill" style="width:60%;background:#F39237"></div></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Mar do Norte</span><span style="font-weight:600">441</span></div><div class="env-bar"><div class="env-bar-fill" style="width:47%;background:#F39237"></div></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Índico</span><span style="font-weight:600">289</span></div><div class="env-bar"><div class="env-bar-fill" style="width:31%;background:#2EB8AC"></div></div>
+            <div style="display:flex;justify-content:space-between"><span style="color:var(--text-muted)">Pacífico</span><span style="font-weight:600">198</span></div><div class="env-bar"><div class="env-bar-fill" style="width:21%;background:#2EB8AC"></div></div>
+          </div>
+        </div>""", unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
