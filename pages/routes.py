@@ -34,3 +34,21 @@ def run():
         cor_t = "#A43955" if total>60 else "#F39237" if total>35 else "#2EB8AC"
         badge_t = "risk-high" if total>60 else "risk-med" if total>35 else "risk-low"
         label_t = "ALTO" if total>60 else "MODERADO" if total>35 else "LEVE"
+
+        col_a, col_b = st.columns([1, 2]) # A lista de todas as espécies com emoji, nome e badge de risco de cada uma isso que importa
+        with col_a:
+            st.markdown(f"""
+            <div style="text-align:center;padding:22px;background:#F8F9FF;border-radius:12px;margin-bottom:14px">
+              <div style="font-size:48px;font-weight:700;color:{cor_t}">{total}%</div>
+              <div style="font-size:13px;color:var(--text-muted);margin-bottom:6px">Risco médio da rota</div>
+              <span class="risk-badge {badge_t}">{label_t}</span>
+            </div>
+            <span class="section-label">Espécies Encontradas</span>""", unsafe_allow_html=True)
+
+            for s in sereias:
+                st.markdown(f"""
+                <div style="display:flex;align-items:center;gap:8px;padding:7px 9px;background:#F8F9FF;border-radius:8px;font-size:12px;margin-bottom:5px">
+                  <span style="font-size:17px">{s['emoji']}</span>
+                  <span style="flex:1;font-weight:500">{s['especie']}</span>
+                  <span class="risk-badge {s['risco_class']}" style="font-size:10px;padding:2px 7px">{s['risco_label']}</span>
+                </div>""", unsafe_allow_html=True)
