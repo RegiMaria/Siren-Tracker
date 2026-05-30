@@ -213,7 +213,7 @@ def gauge_html(pct, color, label):
     </div>"""
 
 def topbar(pagina_ativa="dashboard"):
-    pages = [
+    PAGES = [
         ("dashboard",    "🗺️ Dashboard"),
         ("mapa",         "📍 Mapa"),
         ("intel",        "📡 Inteligência"),
@@ -221,38 +221,44 @@ def topbar(pagina_ativa="dashboard"):
         ("routes",       "🧭 Rotas"),
         ("reports",      "📋 Relatórios"),
     ]
-    nav_html = ""
-    for key, label in pages:
-        ativo = "active" if key == pagina_ativa else ""
-        nav_html += f'<a class="{ativo}" href="/{key}">{label}</a>'
-
-    locked = '<a class="locked">🔒 Detector</a><a class="locked">🔒 Avistamentos</a>'
-
-    return f"""
+    st.markdown(STYLE, unsafe_allow_html=True)
+    st.markdown(f"""
     <div class="topbar">
       <div class="brand">
         {LOGO_SVG}
         Siren Tracker
         <span class="brand-sub">NAVAL INTELLIGENCE v2.4</span>
       </div>
-      <div class="nav">{nav_html}{locked}</div>
-      <button class="btn-cad">Cadastre-se</button>
     </div>
-    <script>
-      (function(){{
-        function tick(){{
-          const n=new Date();
-          const s=String(n.getUTCHours()).padStart(2,'0')+':'+
-                  String(n.getUTCMinutes()).padStart(2,'0')+':'+
-                  String(n.getUTCSeconds()).padStart(2,'0')+' UTC';
-          const el=document.getElementById('utc');
-          if(el)el.textContent=s;
-          else setTimeout(tick,200);
-        }}
-        tick(); setInterval(tick,1000);
-      }})();
-    </script>
-    """
+    <style>
+    [data-testid="baseButton-secondary"]{{
+        background:transparent!important;border:none!important;
+        box-shadow:none!important;padding:6px 11px!important;
+        border-radius:8px!important;font-size:13px!important;
+        font-weight:500!important;color:#606060!important;
+        white-space:nowrap!important;
+    }}
+    [data-testid="baseButton-secondary"]:hover{{background:#F2F5FA!important;color:#0B3954!important}}
+    [data-testid="baseButton-secondary"]:focus{{box-shadow:none!important;outline:none!important}}
+    .nav-ativo [data-testid="baseButton-secondary"]{{background:#EEF2FF!important;color:#4379EE!important}}
+    </style>
+    """, unsafe_allow_html=True)
+    cols = st.columns(len(PAGES) + 2)
+    for i, (key, label) in enumerate(PAGES):
+        with cols[i]:
+            ativo = key == pagina_ativa
+            if ativo:
+                st.markdown('<div class="nav-ativo">', unsafe_allow_html=True)
+            if st.button(label, key=f"_nav_{key}"):
+                st.session_state["_nav_target"] = key
+                st.rerun()
+            if ativo:
+                st.markdown("</div>", unsafe_allow_html=True)
+    with cols[len(PAGES)]:
+        st.button("🔒 Detector", key="_nav_locked_1", disabled=True)
+    with cols[len(PAGES)+1]:
+        st.button("🔒 Avistamentos", key="_nav_locked_2", disabled=True)
+
 
 def sonar_html():
     return """
