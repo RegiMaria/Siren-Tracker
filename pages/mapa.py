@@ -98,4 +98,96 @@ def run():
         else:
             st.caption("Clique num ponto do mapa para ver a ficha da sereia. Dê zoom no litoral para ver as rotas náuticas.")
 
+    with aba2:
+        st.markdown("##### Planeje sua rota e veja as sereias no caminho")
+
+        portos_disponiveis = ", ".join(sorted(set(
+            v["nome"].split(",")[0] for v in PORTOS.values()
+        ))[:20]) + "..."
+        st.caption(f"Portos disponíveis: {portos_disponiveis}")
+
+        col_o, col_d, col_b = st.columns([2, 2, 1])
+        with col_o:
+            origem_txt = st.text_input("Origem", placeholder="Ex: Recife", key="rota_origem")
+        with col_d:
+            destino_txt = st.text_input("Destino", placeholder="Ex: Luanda", key="rota_destino")
+        with col_b:
+            st.write("")
+            calcular = st.button("Ver rota 🧭", use_container_width=True)
+
+        mapa_rota = folium.Map(location=[-10.0, -20.0], zoom_start=3, tiles="CartoDB positron")
+        folium.TileLayer(
+            tiles="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",
+            name="Rotas náuticas", attr="© OpenSeaMap",
+            overlay=True, control=True, opacity=0.7,
+        ).add_to(mapa_rota)
+        folium.LayerControl(position="topright").add_to(mapa_rota)
+
+        na_rota = []
+
+        if calcular and origem_txt and destino_txt:
+            porto_o = buscar_porto(origem_txt)
+            porto_d = buscar_porto(destino_txt)
+
+            if not porto_o:
+                st.error(f"Porto '{origem_txt}' não encontrado. Tente: Recife, Santos, Lisboa, Luanda, Miami...")
+            elif not porto_d:
+                st.error(f"Porto '{destino_txt}' não encontrado. Tente: Recife, Santos, Lisboa, Luanda, Miami...")
+            else:
+                lat_o, lon_o = porto_o["lat"], porto_o["lon"]
+                lat_d, lon_d = porto_d["lat"], porto_d["lon"]
+
+                mid_lat = (lat_o + lat_d) / 2
+                mid_lon = (lon_o + lon_d) / 2 - 8
+
+                pontos_rota = [
+                    [lat_o, lon_o],
+                    [(lat_o + mid_lat) / 2, (lon_o + mid_lon) / 2],
+                    [mid_lat, mid_lon],
+                    [(mid_lat + lat_d) / 2, (mid_lon + lon_d) / 2],
+                    [lat_d, lon_d],
+                ]
+
+                folium.PolyLine(
+                    locations=pontos_rota,
+                    color="#2EB8AC", weight=3,
+                    dash_array="8 5", opacity=0.9,
+                    tooltip=f"Rota: {porto_o['nome']} → {porto_d['nome']}",
+                ).add_to(mapa_rota)
+
+                folium.Marker(
+                    [lat_o, lon_o], popup=porto_o["nome"],
+                    tooltip=f"🚢 Origem: {porto_o['nome']}",
+                    icon=folium.Icon(color="blue", icon="home", prefix="fa"),
+                ).add_to(mapa_rota)
+
+                folium.Marker(
+                    [lat_d, lon_d], popup=porto_d["nome"],
+                    tooltip=f"🏁 Destino: {porto_d['nome']}",
+                    icon=folium.Icon(color="red", icon="flag", prefix="fa"),
+                ).add_to(mapa_rota)
+
+                mapa_rota.fit_bounds([[lat_o, lon_o], [lat_d, lon_d]])
+                na_rota = sereias_proximas(lat_o, lon_o, lat_d, lon_d)
+
+        for s in sereias:
+            na = s in na_rota
+            folium.CircleMarker(
+                location=[s["latitude"], s["longitude"]],
+                radius=13 if na else 7,
+                color="white" if na else CORES[s["risco"]],
+                weight=3 if na else 1,
+                fill=True, fill_color=CORES[s["risco"]],
+                fill_opacity=0.95 if na else 0.2,
+                tooltip=f"{'⚠️ ' if na else ''}{s['nome']} — {s['especie']}",
+            ).add_to(mapa_rota)
+            if na:
+                folium.CircleMarker(
+                    location=[s["latitude"], s["longitude"]],
+                    radius=20, color=CORES[s["risco"]],
+                    weight=1.5, fill=False, opacity=0.4,
+                ).add_to(mapa_rota)
+
+        st_folium(mapa_rota, width="100%", height=460, returned_objects=[])
+
     st.markdown("</div>", unsafe_allow_html=True)
