@@ -69,4 +69,19 @@ def run():
               </div>
             </div>""", unsafe_allow_html=True)
 
-    st.markdown("</div>", unsafe_allow_html=True)
+    st.markdown('<div class="enc-grid">', unsafe_allow_html=True)
+    for s in sereias:
+        rc = "tag-high" if s["risco"]=="alto" else "tag-med" if s["risco"]=="medio" else "tag-low"
+        st.markdown(f"""
+        <div class="spec-card">
+          <div class="spec-card-banner" style="background:{s['bg']}">
+            <span>{s['emoji']}</span>
+            <div style="position:absolute;top:7px;right:7px"><span class="spec-tag {rc}">{s['risco_label']}</span></div>
+          </div>
+          <div class="spec-card-body">
+            <div class="spec-card-name">{s['especie']}</div>
+            <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">{s['habitat'].split(',')[0]}</div>
+            <span class="spec-tag" style="background:#EFF6FF;color:#1a6bb5">Selecione acima ↑</span>
+          </div>
+        </div>""", unsafe_allow_html=True)
+    st.markdown("</div></div>", unsafe_allow_html=True)
