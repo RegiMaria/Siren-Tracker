@@ -12,8 +12,8 @@ Siga estes passos para rodar localmente:
 
 ```bash
 # 1. Clone
-git clone https://github.com/seu-usuario/sirenatrack.git
-cd sirenatrack
+git clone https://github.com/RegiMaria/Siren-Tracker.git
+cd Siren-Tracker
 
 # 2. Ambiente virtual
 python -m venv venv
@@ -65,8 +65,6 @@ Siren-Tracker/
 - **Streamlit** — interface web
 - **Folium + streamlit-folium** — mapas interativos reais
 - **OpenSeaMap** — rotas náuticas reais
-- **searoute** — cálculo de rotas marítimas (evita continentes)
-- **geopy + Nominatim** — geocodificação mundial gratuita
 - **Anthropic Claude API** — análise de canto e laudos científicos
 
 ---
