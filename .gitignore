@@ -27,6 +27,7 @@ build/
 Thumbs.db
 *.swp
 *.swo
+*Zone.Identifier*
 
 # IDE
 .vscode/
