@@ -12,35 +12,38 @@ def run():
     st.markdown(topbar("encyclopedia"), unsafe_allow_html=True)
     st.markdown('<div class="content">', unsafe_allow_html=True)
     st.markdown('<div class="page-title">Enciclopédia de Ameaças</div>', unsafe_allow_html=True)
-    st.markdown('<p style="color:var(--text-muted);font-size:14px;margin-top:-14px;margin-bottom:20px">Base de dados de inteligência classificada — 7 espécies catalogadas</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#606060;font-size:14px;margin-top:-14px;margin-bottom:20px">Base de dados de inteligência classificada — 7 espécies catalogadas</p>', unsafe_allow_html=True)
 
-    especie_sel = st.selectbox(
-        "Selecione uma espécie para ver a ficha completa",
-        options=[""] + [s["especie"] for s in sereias],
-        format_func=lambda x: "-- Escolha uma espécie --" if x == "" else f"{next((s['emoji'] for s in sereias if s['especie']==x),'')}{x}",
-    )
+    if "enc_sel" not in st.session_state:
+        st.session_state.enc_sel = None
 
-    if especie_sel:
-        s = next((x for x in sereias if x["especie"] == especie_sel), None)
+    # ── ficha detalhada ───────────────────────────────────────────────────────
+    if st.session_state.enc_sel:
+        s = next((x for x in sereias if x["especie"] == st.session_state.enc_sel), None)
         if s:
             cor = s["color"]
             bg  = s["bg"]
             pct = s["ameaca_pct"]
             rc  = s["risco_class"]
+
+            if st.button("← Voltar para a enciclopédia", key="enc_back"):
+                st.session_state.enc_sel = None
+                st.rerun()
+
             st.markdown(f"""
             <div class="card" style="margin-bottom:20px">
-              <div style="padding:22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:18px;background:{bg}">
+              <div style="padding:22px;border-bottom:1px solid #DAE3F8;display:flex;align-items:flex-start;gap:18px;background:{bg}">
                 <div style="width:90px;height:90px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;background:{cor}22;border:2px solid {cor}33;flex-shrink:0">{s['emoji']}</div>
                 <div style="flex:1">
                   <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-                    <h2 style="font-size:22px;font-weight:700;color:var(--text-primary)">{s['especie']}</h2>
+                    <h2 style="font-size:22px;font-weight:700;color:#0B1C33">{s['especie']}</h2>
                     <span class="risk-badge {rc}">{s['risco_label']}</span>
                   </div>
-                  <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">{s['habitat']}</div>
+                  <div style="font-size:13px;color:#606060;margin-bottom:8px">{s['habitat']}</div>
                   <span class="chip">Profundidade: {s['profundidade']}</span>
                   <span class="chip">Freq.: {s['freq']}</span>
                   <div style="margin-top:8px">
-                    <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">NÍVEL DE AMEAÇA</div>
+                    <div style="font-size:10px;color:#606060;margin-bottom:3px">NÍVEL DE AMEAÇA</div>
                     <div class="threat-meter"><div class="threat-fill" style="width:{pct}%;background:{cor}"></div></div>
                   </div>
                 </div>
@@ -69,21 +72,27 @@ def run():
                 </div>
               </div>
             </div>
-          </div>""", unsafe_allow_html=True)
+            </div>""", unsafe_allow_html=True)
+            return
 
-    st.markdown('<div class="enc-grid">', unsafe_allow_html=True)
-    for s in sereias:
+    # ── grid de cards ─────────────────────────────────────────────────────────
+    cols = st.columns(3)
+    for i, s in enumerate(sereias):
         rc = "tag-high" if s["risco"]=="alto" else "tag-med" if s["risco"]=="medio" else "tag-low"
-        st.markdown(f"""
-        <div class="spec-card">
-          <div class="spec-card-banner" style="background:{s['bg']}">
-            <span>{s['emoji']}</span>
-            <div style="position:absolute;top:7px;right:7px"><span class="spec-tag {rc}">{s['risco_label']}</span></div>
-          </div>
-          <div class="spec-card-body">
-            <div class="spec-card-name">{s['especie']}</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">{s['habitat'].split(',')[0]}</div>
-            <span class="spec-tag" style="background:#EFF6FF;color:#1a6bb5">Selecione acima ↑</span>
-          </div>
-        </div>""", unsafe_allow_html=True)
-    st.markdown("</div></div>", unsafe_allow_html=True)
+        with cols[i % 3]:
+            st.markdown(f"""
+            <div class="spec-card" style="margin-bottom:16px">
+              <div class="spec-card-banner" style="background:{s['bg']}">
+                <span style="font-size:52px">{s['emoji']}</span>
+                <div style="position:absolute;top:10px;right:10px"><span class="spec-tag {rc}">{s['risco_label']}</span></div>
+              </div>
+              <div class="spec-card-body">
+                <div class="spec-card-name">{s['especie']}</div>
+                <div style="font-size:12px;color:#606060;margin-bottom:12px">{s['habitat'].split(',')[0]}</div>
+              </div>
+            </div>""", unsafe_allow_html=True)
+            if st.button(f"Ver relatório completo →", key=f"enc_{s['key']}"):
+                st.session_state.enc_sel = s["especie"]
+                st.rerun()
+
+    st.markdown("</div>", unsafe_allow_html=True)
