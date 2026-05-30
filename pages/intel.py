@@ -24,4 +24,8 @@ def run():
         for cls, badge, texto, meta in alertas:
             st.markdown(f'<div class="intel-alert {cls}"><span class="intel-badge">{badge}</span><div class="intel-text">{texto}</div><div class="intel-meta">{meta}</div></div>', unsafe_allow_html=True)
 
+    with col2:
+        st.markdown('<span class="section-label">Radar Oceânico</span>', unsafe_allow_html=True)
+        st.markdown(sonar_html(), unsafe_allow_html=True)
+
     st.markdown("</div>", unsafe_allow_html=True)
