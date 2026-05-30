@@ -206,6 +206,12 @@ def run():
 
         st_folium(mapa, width="100%", height=340, returned_objects=[])
 
+        if calcular:
+            if not porto_o:
+                st.error(f"'{origem_txt}' não reconhecido pelo sistema de inteligência naval. Tente: Santos, Recife, Lisboa, Miami, Rotterdam, Luanda...")
+            elif not porto_d:
+                st.error(f"'{destino_txt}' não reconhecido. Tente: Santos, Recife, Lisboa, Miami, Rotterdam, Luanda...")
+
         # resumo de risco abaixo do mapa
         if na_rota:
             alto  = sum(1 for s in na_rota if s["risco"]=="alto")
