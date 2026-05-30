@@ -52,3 +52,18 @@ def run():
                   <span style="flex:1;font-weight:500">{s['especie']}</span>
                   <span class="risk-badge {s['risco_class']}" style="font-size:10px;padding:2px 7px">{s['risco_label']}</span>
                 </div>""", unsafe_allow_html=True)
+        
+        with col_b:
+            st.markdown(f'<span class="section-label">Linha do Tempo — {origem} → {destino}</span>', unsafe_allow_html=True)
+            st.markdown('<div class="route-timeline"><div class="rt-header">ANÁLISE SEGMENTO POR SEGMENTO</div>', unsafe_allow_html=True)
+            for z in zonas:
+                st.markdown(f"""
+                <div class="rt-row">
+                  <div class="rt-dot" style="background:{z['cor']}"></div>
+                  <div>
+                    <div style="font-weight:500;color:var(--text-primary);font-size:12px">{z['nome']} <span style="color:var(--text-muted)">({z['km']})</span></div>
+                    <div style="color:var(--text-muted);font-size:11px;margin-top:2px">Espécie: <strong>{z['sp']}</strong> · Risco: <strong style="color:{z['cor']}">{z['r']}%</strong></div>
+                    <div style="color:var(--text-muted);font-size:11px;margin-top:1px">{z['nota']}</div>
+                  </div>
+                </div>""", unsafe_allow_html=True)
+            st.markdown("</div>", unsafe_allow_html=True)
