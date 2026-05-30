@@ -1,5 +1,5 @@
 import streamlit as st
-import json, os, sys, random
+import json, os, sys
 sys.path.insert(0, os.path.dirname(os.path.dirname(__file__)))
 from style import STYLE, topbar
 
