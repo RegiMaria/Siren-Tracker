@@ -224,7 +224,7 @@ def topbar(pagina_ativa="dashboard"):
     nav_html = ""
     for key, label in pages:
         ativo = "active" if key == pagina_ativa else ""
-        nav_html += f'<a class="{ativo}" href="/{key}">{label}</a>'
+        nav_html += f'<a class="{ativo}" href="/{key}" target="_self">{label}</a>'
 
     locked = '<a class="locked">🔒 Detector</a><a class="locked">🔒 Avistamentos</a>'
 
@@ -263,7 +263,7 @@ def sonar_html():
         <div style="position:absolute;border-radius:50%;border:1px solid rgba(46,184,172,.3);animation:sp 3s ease-out .7s infinite;width:120px;height:120px"></div>
         <div style="position:absolute;border-radius:50%;border:1px solid rgba(46,184,172,.3);animation:sp 3s ease-out 1.4s infinite;width:70px;height:70px"></div>
         <div style="width:8px;height:8px;border-radius:50%;background:#2EB8AC;position:absolute;z-index:5"></div>
-        <div style="position:absolute;width:50%;height:1px;background:linear-gradient(to right,transparent,rgba(46,184,172,.6));transform-origin:left center;animation:sc 4s linear infinite;left:50%;top:50%"></div>
+        <div style="position:absolute;width:92px;height:2px;background:linear-gradient(to right,rgba(46,184,172,.15),rgba(46,184,172,.8));transform-origin:left center;animation:sc 4s linear infinite;left:50%;top:50%"></div>
         <div style="position:absolute;top:28%;left:58%;width:6px;height:6px;border-radius:50%;background:#A43955;box-shadow:0 0 8px #A43955"></div>
         <div style="position:absolute;top:33%;left:63%;width:6px;height:6px;border-radius:50%;background:#A43955;box-shadow:0 0 8px #A43955"></div>
         <div style="position:absolute;top:68%;left:38%;width:6px;height:6px;border-radius:50%;background:#F39237;box-shadow:0 0 6px #F39237"></div>
