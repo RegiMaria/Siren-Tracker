@@ -81,7 +81,8 @@ def run():
         rc = "tag-high" if s["risco"]=="alto" else "tag-med" if s["risco"]=="medio" else "tag-low"
         with cols[i % 3]:
             st.markdown(f"""
-            <div class="spec-card" onclick="window.location.search='?enc={s['key']}'" style="cursor:pointer;margin-bottom:16px">
+            <a href="?enc={s['key']}" target="_self" style="text-decoration:none;color:inherit">
+            <div class="spec-card" style="cursor:pointer;margin-bottom:16px">
               <div class="spec-card-banner" style="background:{s['bg']}">
                 <span style="font-size:52px">{s['emoji']}</span>
                 <div style="position:absolute;top:10px;right:10px"><span class="spec-tag {rc}">{s['risco_label']}</span></div>
@@ -90,6 +91,7 @@ def run():
                 <div class="spec-card-name">{s['especie']}</div>
                 <div style="font-size:12px;color:#606060;margin-bottom:8px">{s['habitat'].split(',')[0]}</div>
               </div>
-            </div>""", unsafe_allow_html=True)
+            </div>
+            </a>""", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
