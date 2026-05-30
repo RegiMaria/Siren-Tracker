@@ -27,5 +27,15 @@ def run():
     with col2:
         st.markdown('<span class="section-label">Radar Oceânico</span>', unsafe_allow_html=True)
         st.markdown(sonar_html(), unsafe_allow_html=True)
+        st.markdown("""
+        <div style="background:var(--surface);border:1px solid var(--border);border-radius:12px;padding:14px;margin-top:14px">
+          <span class="section-label">Zonas de Caça Ativas</span>
+          <div style="display:flex;flex-direction:column;gap:7px">
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:#FEF0F3;border-radius:8px;border-left:3px solid #A43955"><div><div style="font-size:13px;font-weight:600">Atlântico Norte</div><div style="font-size:11px;color:var(--text-muted)">Merrow · 12 indivíduos · Caça ativa</div></div><span class="risk-badge risk-high" style="font-size:11px;padding:3px 9px">CRÍTICA</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:#FEF0F3;border-radius:8px;border-left:3px solid #A43955"><div><div style="font-size:13px;font-weight:600">Açores — Águas Vulcânicas</div><div style="font-size:11px;color:var(--text-muted)">Siren · Migração + caça coletiva</div></div><span class="risk-badge risk-high" style="font-size:11px;padding:3px 9px">CRÍTICA</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:#FCF5EB;border-radius:8px;border-left:3px solid #F39237"><div><div style="font-size:13px;font-weight:600">Mar do Norte</div><div style="font-size:11px;color:var(--text-muted)">Selkie · Territorial · Fase lunar</div></div><span class="risk-badge risk-med" style="font-size:11px;padding:3px 9px">ELEVADA</span></div>
+            <div style="display:flex;align-items:center;justify-content:space-between;padding:9px 11px;background:#EFF6FF;border-radius:8px;border-left:3px solid #3B8BD4"><div><div style="font-size:13px;font-weight:600">Caribe</div><div style="font-size:11px;color:var(--text-muted)">Locathah · Migração · Não hostil</div></div><span class="risk-badge risk-low" style="font-size:11px;padding:3px 9px">MONIT.</span></div>
+          </div>
+        </div>""", unsafe_allow_html=True)
 
     st.markdown("</div>", unsafe_allow_html=True)
