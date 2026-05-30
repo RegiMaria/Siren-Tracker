@@ -21,3 +21,16 @@ def run():
     with col3:
         st.write("")
         analisar = st.button("Gerar Análise 🧭", use_container_width=True)
+
+    if analisar:
+        zonas = [
+            {"nome": f"Zona de Saída — {origem.split(',')[0]}", "km":"0–800km",    "r":15, "cor":"#2EB8AC", "sp":"Zorah",          "nota":"Trânsito seguro — Zorah avistados, comportamento passivo"},
+            {"nome":"Atlântico Central — Convergência",          "km":"800–2400km", "r":52, "cor":"#F39237", "sp":"Rusalka",        "nota":"Temperatura 26°C — favorável a migração Rusalka"},
+            {"nome":"Zona de Risco Crítico — Mid-Atlantic",      "km":"2400–3800km","r":87, "cor":"#A43955", "sp":"Merrow + Siren", "nota":"Lua cheia + cluster de 5 Merrow + migração Siren ativa"},
+            {"nome":"Aproximação Europa — Mar Aberto",           "km":"3800–5200km","r":41, "cor":"#F39237", "sp":"Selkie",         "nota":"Territórios Selkie intermitentes — atenção a 58°N"},
+            {"nome": f"Entrada {destino.split(',')[0]}",         "km":"5200–5800km","r":20, "cor":"#2EB8AC", "sp":"Handwerkskunst", "nota":"Manufactura subaquática — manter 15nm do fundo"},
+        ]
+        total = int(sum(z["r"] for z in zonas) / len(zonas))
+        cor_t = "#A43955" if total>60 else "#F39237" if total>35 else "#2EB8AC"
+        badge_t = "risk-high" if total>60 else "risk-med" if total>35 else "risk-low"
+        label_t = "ALTO" if total>60 else "MODERADO" if total>35 else "LEVE"
