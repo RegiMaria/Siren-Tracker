@@ -190,4 +190,60 @@ def run():
 
         st_folium(mapa_rota, width="100%", height=460, returned_objects=[])
 
+        if calcular and na_rota and origem_txt and destino_txt:
+            porto_o = buscar_porto(origem_txt)
+            porto_d = buscar_porto(destino_txt)
+            if porto_o and porto_d:
+                alto  = sum(1 for s in na_rota if s["risco"] == "alto")
+                medio = sum(1 for s in na_rota if s["risco"] == "medio")
+                baixo = sum(1 for s in na_rota if s["risco"] == "baixo")
+                risco_pct = min(int((alto * 70 + medio * 40 + baixo * 10) / max(len(na_rota), 1)), 95)
+                cor_g = "#A43955" if risco_pct > 60 else "#F39237" if risco_pct > 35 else "#2EB8AC"
+
+                st.divider()
+                st.markdown(f"**Rota: {porto_o['nome']} → {porto_d['nome']}** — {len(na_rota)} sereias detectadas")
+
+                c1, c2, c3, c4 = st.columns(4)
+                c1.metric("Sereias na rota", len(na_rota))
+                c2.metric("🔴 Alto risco", alto)
+                c3.metric("🟡 Médio risco", medio)
+                c4.metric("🟢 Baixo risco", baixo)
+
+                st.markdown(f"""
+                <div style="background:#F8F9FF;border-radius:12px;padding:16px;margin-top:10px">
+                  <div style="display:flex;gap:20px;align-items:flex-start;">
+                    {gauge_html(risco_pct, cor_g, 'Risco geral na rota')}
+                    <div style="flex:1;font-size:12px;color:var(--text-muted);line-height:1.7;border-left:1px solid var(--border);padding-left:16px">
+                      <strong style="color:var(--text-primary);display:block;margin-bottom:6px">⚠ Análise de Inteligência Oceânica</strong>
+                      <div class="risk-factor"><span class="rfd" style="background:#A43955"></span>{alto} sereia(s) de alto risco detectada(s) na rota</div>
+                      <div class="risk-factor"><span class="rfd" style="background:#F39237"></span>Temperatura estimada: {18 + random.random()*8:.1f}°C</div>
+                      <div class="risk-factor"><span class="rfd" style="background:#F39237"></span>{random.randint(1,5)} naufrágios históricos registrados na área</div>
+                      <div class="risk-factor"><span class="rfd" style="background:#2EB8AC"></span>Ressonância mágica: {'elevada' if alto > 0 else 'moderada'}</div>
+                      <div class="alt-route">
+                        <div class="alt-label">🧭 Rota alternativa sugerida</div>
+                        Rota via {'norte' if random.random() > 0.5 else 'sul'} apresenta {random.randint(20, 42)}% menos risco de encontro hostil.
+                      </div>
+                    </div>
+                  </div>
+                </div>""", unsafe_allow_html=True)
+
+                st.divider()
+                cols = st.columns(min(len(na_rota), 4))
+                for i, s in enumerate(na_rota):
+                    with cols[i % 4]:
+                        cor = CORES[s["risco"]]
+                        st.markdown(f"""
+                        <div style="border:1px solid {cor};border-radius:10px;padding:11px;margin-bottom:8px">
+                          <div style="font-size:20px;margin-bottom:3px">{s['emoji']}</div>
+                          <b style="font-size:13px">{s['nome']}</b><br>
+                          <span class="risk-badge {s['risco_class']}" style="margin-top:5px;display:inline-flex;font-size:11px">{LABELS[s['risco']]}</span><br>
+                          <span style="font-size:11px;color:#888;margin-top:3px;display:block">{s['especie']} · {s['regiao']}</span>
+                        </div>""", unsafe_allow_html=True)
+
+        elif calcular and not na_rota and origem_txt and destino_txt:
+            porto_o = buscar_porto(origem_txt)
+            porto_d = buscar_porto(destino_txt)
+            if porto_o and porto_d:
+                st.success(f"✅ Rota {porto_o['nome']} → {porto_d['nome']} segura! Nenhuma sereia detectada no trajeto. Boa viagem. 🧜")
+
     st.markdown("</div>", unsafe_allow_html=True)
