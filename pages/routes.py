@@ -67,3 +67,23 @@ def run():
                   </div>
                 </div>""", unsafe_allow_html=True)
             st.markdown("</div>", unsafe_allow_html=True)
+# Rota alternativa e segura ou rota moderada. A escolha é sua!
+            st.markdown("""
+            <div style="display:grid;grid-template-columns:1fr 1fr;gap:10px;margin-top:10px">
+              <div style="padding:11px;background:var(--teal-light);border:1px solid var(--teal-border);border-radius:8px">
+                <div style="font-size:11px;font-weight:700;color:#27A468;margin-bottom:3px">🧭 ROTA ALTERNATIVA — SEGURA</div>
+                <div style="font-size:12px">Via 28°S desvia da zona crítica. +340km mas reduz risco em 38%.</div>
+              </div>
+              <div style="padding:11px;background:var(--amber-light);border:1px solid var(--amber-border);border-radius:8px">
+                <div style="font-size:11px;font-weight:700;color:#c07a0a;margin-bottom:3px">⚡ ROTA RÁPIDA — MODERADA</div>
+                <div style="font-size:12px">Rota direta às 14h-16h UTC reduz exposição Siren em 22%.</div>
+              </div>
+            </div>""", unsafe_allow_html=True)
+    else:
+        st.markdown("""
+        <div style="padding:50px;text-align:center;color:var(--text-muted);font-size:14px;background:var(--surface);border:1px solid var(--border);border-radius:14px">
+          Configure origem e destino e clique em "Gerar Análise" para o relatório completo de risco.
+        </div>""", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
+
