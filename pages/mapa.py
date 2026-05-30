@@ -55,6 +55,47 @@ def run():
         ).add_to(mapa)
         folium.LayerControl(position="topright").add_to(mapa)
 
-        st_folium(mapa, width="100%", height=460, returned_objects=[])
+        heat_data = [[s["latitude"], s["longitude"], s["avistamentos"]] for s in filtradas]
+        if heat_data:
+            HeatMap(heat_data, radius=40, blur=25, min_opacity=0.3).add_to(mapa)
+
+        for s in filtradas:
+            folium.CircleMarker(
+                location=[s["latitude"], s["longitude"]],
+                radius=10, color="white", weight=2,
+                fill=True, fill_color=CORES[s["risco"]], fill_opacity=0.9,
+                tooltip=f"{s['nome']} ({s['especie']}) — clique para ver ficha",
+            ).add_to(mapa)
+
+        saida = st_folium(mapa, width="100%", height=460,
+                          returned_objects=["last_object_clicked_tooltip"])
+
+        if saida and saida.get("last_object_clicked_tooltip"):
+            nome = saida["last_object_clicked_tooltip"].split(" (")[0]
+            s = next((x for x in sereias if x["nome"] == nome), None)
+            if s:
+                cor = CORES[s["risco"]]
+                st.markdown(f"""
+                <div class="ficha-sereia" style="border-color:{cor};background:{cor}11;">
+                  <div style="display:flex;align-items:center;justify-content:space-between;margin-bottom:8px;">
+                    <div style="display:flex;align-items:center;gap:10px;">
+                      <span style="font-size:22px">{s['emoji']}</span>
+                      <div>
+                        <b style="font-size:15px">{s['nome']}</b>
+                        <span style="font-size:12px;color:#888;margin-left:8px">{s['especie']}</span>
+                      </div>
+                    </div>
+                    <span class="risk-badge {s['risco_class']}">{LABELS[s['risco']]}</span>
+                  </div>
+                  <div class="ficha-grid">
+                    <div><div class="ficha-item-label">Categoria</div><div class="ficha-item-value">{s['categoria']}</div></div>
+                    <div><div class="ficha-item-label">Carnívora</div><div class="ficha-item-value">{'Sim ⚠️' if s['carnivora'] else 'Não'}</div></div>
+                    <div><div class="ficha-item-label">Profundidade</div><div class="ficha-item-value">{s['profundidade']}</div></div>
+                    <div><div class="ficha-item-label">Avistamentos</div><div class="ficha-item-value">{s['avistamentos']} reg.</div></div>
+                  </div>
+                  <div style="font-size:12px;color:#888;border-top:0.5px solid #eee;padding-top:7px">{s['lore'][:200]}...</div>
+                </div>""", unsafe_allow_html=True)
+        else:
+            st.caption("Clique num ponto do mapa para ver a ficha da sereia. Dê zoom no litoral para ver as rotas náuticas.")
 
     st.markdown("</div>", unsafe_allow_html=True)
