@@ -26,7 +26,8 @@ def run():
         _, col_fechar = st.columns([15, 1])
         with col_fechar:
             if st.button("× Fechar", use_container_width=True):
-                del st.query_params["enc"]
+                if "enc" in st.query_params:
+                    del st.query_params["enc"]
                 st.rerun()
 
         st.markdown(f"""
