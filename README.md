@@ -83,6 +83,35 @@ Siren-Tracker/
 
 ---
 
+## 🧪 Testes
+
+Dois conjuntos de testes verificam a lógica central:
+
+**`tests/test_mapa.py`**
+
+Testa a função `avistamentos_na_rota()`, responsável por detectar sereias dentro de um corredor ao longo de uma rota marítima:
+- Rota Santos → Lisboa encontra avistamentos reais no Atlântico
+- Rota remota no Pacífico Sul retorna lista vazia
+- Corredor mais largo retorna ao menos tantos resultados quanto o estreito
+
+**`tests/test_dados.py`** 
+
+Lê `data/sereias.json` e garante a integridade dos dados:
+- Todos os campos obrigatórios estão presentes em cada espécie
+- Valores de risco são válidos (`alto`, `medio`, `baixo`)
+- Coordenadas estão dentro dos limites geográficos reais
+- Não há `key` duplicada
+
+### Como rodar
+
+```bash
+source venv/bin/activate
+pip install pytest
+pytest tests/ -v
+```
+
+---
+
 ## **FAQ**
 
 - **P: Quanto pesa uma sereia adulta em libras esterlinas?**
