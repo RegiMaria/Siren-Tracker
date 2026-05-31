@@ -11,16 +11,30 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "sereias.json"
 with open(DATA_PATH, encoding="utf-8") as f:
     sereias = json.load(f)
 
-def sereias_proximas(lat_o, lon_o, lat_d, lon_d, margem=4.0):
+AVIST_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "avistamentos.json")
+with open(AVIST_PATH, encoding="utf-8") as f:
+    avistamentos = json.load(f)
+
+# índice rápido espécie por key (para abrir ficha completa a partir do avistamento)
+SEREIA_POR_KEY = {s["key"]: s for s in sereias}
+
+def _dist_ponto_segmento(px, py, ax, ay, bx, by):
+    """Distância (graus) de um ponto P ao segmento de rota A→B."""
+    dx, dy = bx - ax, by - ay
+    if dx == 0 and dy == 0:
+        return ((px - ax) ** 2 + (py - ay) ** 2) ** 0.5
+    t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)
+    t = max(0.0, min(1.0, t))
+    cx, cy = ax + t * dx, ay + t * dy
+    return ((px - cx) ** 2 + (py - cy) ** 2) ** 0.5
+
+def avistamentos_na_rota(lat_o, lon_o, lat_d, lon_d, corredor=6.0):
+    """Avistamentos dentro do corredor de largura `corredor` ao longo da rota."""
     resultado = []
-    for s in sereias:
-        lat_s, lon_s = s["latitude"], s["longitude"]
-        lat_min = min(lat_o, lat_d) - margem
-        lat_max = max(lat_o, lat_d) + margem
-        lon_min = min(lon_o, lon_d) - margem
-        lon_max = max(lon_o, lon_d) + margem
-        if lat_min <= lat_s <= lat_max and lon_min <= lon_s <= lon_max:
-            resultado.append(s)
+    for a in avistamentos:
+        d = _dist_ponto_segmento(a["lat"], a["lon"], lat_o, lon_o, lat_d, lon_d)
+        if d <= corredor:
+            resultado.append(a)
     return resultado
 
 def run():
@@ -41,14 +55,13 @@ def run():
                 format_func=lambda x: LABELS[x],
                 key="filtro_risco",
             )
-        filtradas = [s for s in sereias if s["risco"] in filtro]
+        visiveis = [a for a in avistamentos if a["risco"] in filtro]
         with col_i:
-            st.metric("Sereias visíveis", len(filtradas))
+            st.metric("Avistamentos no mundo", len(visiveis))
 
-        coords = [[s["latitude"], s["longitude"]] for s in sereias]
-        mapa = folium.Map(location=[-15.0, -40.0], zoom_start=5, tiles="CartoDB positron")
-        if coords:
-            mapa.fit_bounds(coords, padding=(30, 30))
+        # ── mapa-múndi ───────────────────────────────────────────────────────
+        mapa = folium.Map(location=[20.0, 0.0], zoom_start=2, tiles="CartoDB positron",
+                          min_zoom=2, max_bounds=True, world_copy_jump=True)
         folium.TileLayer(
             tiles="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",
             name="Rotas náuticas", attr="© OpenSeaMap",
@@ -56,24 +69,24 @@ def run():
         ).add_to(mapa)
         folium.LayerControl(position="topright").add_to(mapa)
 
-        heat_data = [[s["latitude"], s["longitude"], s["avistamentos"]] for s in filtradas]
+        heat_data = [[a["lat"], a["lon"], a["intensidade"]] for a in visiveis]
         if heat_data:
-            HeatMap(heat_data, radius=35, blur=20, min_opacity=0.2).add_to(mapa)
+            HeatMap(heat_data, radius=28, blur=18, min_opacity=0.25).add_to(mapa)
 
-        for s in filtradas:
+        for a in visiveis:
             folium.CircleMarker(
-                location=[s["latitude"], s["longitude"]],
-                radius=14, color="white", weight=2.5,
-                fill=True, fill_color=CORES[s["risco"]], fill_opacity=0.95,
-                tooltip=f"{s['nome']} ({s['especie']}) — {LABELS[s['risco']]}",
+                location=[a["lat"], a["lon"]],
+                radius=9, color="white", weight=2,
+                fill=True, fill_color=CORES[a["risco"]], fill_opacity=0.95,
+                tooltip=f"{a['especie']} — {a['local']} · {LABELS[a['risco']]}",
             ).add_to(mapa)
 
-        saida = st_folium(mapa, width="100%", height=460,
+        saida = st_folium(mapa, width="100%", height=480,
                           returned_objects=["last_object_clicked_tooltip"])
 
         if saida and saida.get("last_object_clicked_tooltip"):
-            nome = saida["last_object_clicked_tooltip"].split(" (")[0]
-            s = next((x for x in sereias if x["nome"] == nome), None)
+            especie_clic = saida["last_object_clicked_tooltip"].split(" — ")[0]
+            s = next((x for x in sereias if x["especie"] == especie_clic), None)
             if s:
                 cor = CORES[s["risco"]]
                 st.markdown(f"""
@@ -97,7 +110,7 @@ def run():
                   <div style="font-size:12px;color:#888;border-top:0.5px solid #eee;padding-top:7px">{s['lore'][:200]}...</div>
                 </div>""", unsafe_allow_html=True)
         else:
-            st.caption("Clique num ponto do mapa para ver a ficha da sereia. Dê zoom no litoral para ver as rotas náuticas.")
+            st.caption("Mapa-múndi de avistamentos das 7 espécies catalogadas. Clique num ponto para ver a ficha completa da espécie. Dê zoom no litoral para ver as rotas náuticas.")
 
     with aba2:
         st.markdown("##### Planeje sua rota e veja as sereias no caminho")
@@ -116,7 +129,8 @@ def run():
             st.write("")
             calcular = st.button("Ver rota 🧭", use_container_width=True)
 
-        mapa_rota = folium.Map(location=[-10.0, -20.0], zoom_start=3, tiles="CartoDB positron")
+        mapa_rota = folium.Map(location=[20.0, 0.0], zoom_start=2, tiles="CartoDB positron",
+                               min_zoom=2, max_bounds=True, world_copy_jump=True)
         folium.TileLayer(
             tiles="https://tiles.openseamap.org/seamark/{z}/{x}/{y}.png",
             name="Rotas náuticas", attr="© OpenSeaMap",
@@ -168,24 +182,25 @@ def run():
                     icon=folium.Icon(color="red", icon="flag", prefix="fa"),
                 ).add_to(mapa_rota)
 
-                mapa_rota.fit_bounds([[lat_o, lon_o], [lat_d, lon_d]])
-                na_rota = sereias_proximas(lat_o, lon_o, lat_d, lon_d)
+                mapa_rota.fit_bounds([[lat_o, lon_o], [lat_d, lon_d]], padding=(40, 40))
+                na_rota = avistamentos_na_rota(lat_o, lon_o, lat_d, lon_d)
 
-        for s in sereias:
-            na = s in na_rota
+        na_rota_ids = {id(a) for a in na_rota}
+        for a in avistamentos:
+            na = id(a) in na_rota_ids
             folium.CircleMarker(
-                location=[s["latitude"], s["longitude"]],
-                radius=13 if na else 7,
-                color="white" if na else CORES[s["risco"]],
+                location=[a["lat"], a["lon"]],
+                radius=12 if na else 6,
+                color="white" if na else CORES[a["risco"]],
                 weight=3 if na else 1,
-                fill=True, fill_color=CORES[s["risco"]],
-                fill_opacity=0.95 if na else 0.2,
-                tooltip=f"{'⚠️ ' if na else ''}{s['nome']} — {s['especie']}",
+                fill=True, fill_color=CORES[a["risco"]],
+                fill_opacity=0.95 if na else 0.18,
+                tooltip=f"{'⚠️ ' if na else ''}{a['especie']} — {a['local']}",
             ).add_to(mapa_rota)
             if na:
                 folium.CircleMarker(
-                    location=[s["latitude"], s["longitude"]],
-                    radius=20, color=CORES[s["risco"]],
+                    location=[a["lat"], a["lon"]],
+                    radius=18, color=CORES[a["risco"]],
                     weight=1.5, fill=False, opacity=0.4,
                 ).add_to(mapa_rota)
 
@@ -201,11 +216,14 @@ def run():
                 risco_pct = min(int((alto * 70 + medio * 40 + baixo * 10) / max(len(na_rota), 1)), 95)
                 cor_g = "#A43955" if risco_pct > 60 else "#F39237" if risco_pct > 35 else "#2EB8AC"
 
+                especies_rota = list(dict.fromkeys(a["key"] for a in na_rota))
+
                 st.divider()
-                st.markdown(f"**Rota: {porto_o['nome']} → {porto_d['nome']}** — {len(na_rota)} sereias detectadas")
+                st.markdown(f"**Rota: {porto_o['nome']} → {porto_d['nome']}** — "
+                            f"{len(na_rota)} avistamentos · {len(especies_rota)} espécies no caminho")
 
                 c1, c2, c3, c4 = st.columns(4)
-                c1.metric("Sereias na rota", len(na_rota))
+                c1.metric("Avistamentos na rota", len(na_rota))
                 c2.metric("🔴 Alto risco", alto)
                 c3.metric("🟡 Médio risco", medio)
                 c4.metric("🟢 Baixo risco", baixo)
@@ -229,8 +247,10 @@ def run():
                 </div>""", unsafe_allow_html=True)
 
                 st.divider()
-                cols = st.columns(min(len(na_rota), 4))
-                for i, s in enumerate(na_rota):
+                cols = st.columns(min(len(especies_rota), 4))
+                for i, key in enumerate(especies_rota):
+                    s = SEREIA_POR_KEY[key]
+                    locais = [a["local"] for a in na_rota if a["key"] == key]
                     with cols[i % 4]:
                         cor = CORES[s["risco"]]
                         st.markdown(f"""
@@ -238,7 +258,8 @@ def run():
                           <div style="font-size:20px;margin-bottom:3px">{s['emoji']}</div>
                           <b style="font-size:13px">{s['nome']}</b><br>
                           <span class="risk-badge {s['risco_class']}" style="margin-top:5px;display:inline-flex;font-size:11px">{LABELS[s['risco']]}</span><br>
-                          <span style="font-size:11px;color:#888;margin-top:3px;display:block">{s['especie']} · {s['regiao']}</span>
+                          <span style="font-size:11px;color:#888;margin-top:3px;display:block">{s['especie']} · {len(locais)} ponto(s)</span>
+                          <span style="font-size:10px;color:#aaa;margin-top:2px;display:block">{', '.join(locais)}</span>
                         </div>""", unsafe_allow_html=True)
 
         elif calcular and not na_rota and origem_txt and destino_txt:
