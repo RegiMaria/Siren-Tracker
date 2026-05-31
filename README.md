@@ -2,6 +2,8 @@
 
 > Tecnologia de ponta para um problema que a ciência ainda não reconhece.
 
+**[Acesse o Siren Tracker](https://siren-tracker.streamlit.app/)** Não entre no mar sem ele. Na verdade, talvez não entre no mar.
+
 Plataforma de inteligência naval para monitoramento de entidades aquáticas não-catalogadas. Interface rápida, mapas interativos, central de alertas e enciclopédia completa com fichas por espécie.
 
 ---
@@ -139,3 +141,29 @@ pytest tests/ -v
   - **R:** Só se o coqueiro enviar coordenadas GPS; plantas sem GPS não são georreferenciadas.
 
 ---
+
+## 🚀 Codecon Universe 26
+
+Este projeto foi construído durante o **Codecon Universe 26** — um hackathon de ideias inúteis e absurdas, realizado de 29 a 31 de maio de 2026.
+
+O tema foi inspirado nos livros do Guia do Mochileiro das Galáxias. A instrução era **não entrar em pânico.**
+
+Construímos um rastreador de sereias.
+
+Há quem diga que entramos em pânico.
+
+---
+
+## 🐬 Adeus, e obrigada pelos peixes
+
+O oceano sempre foi vasto, perigoso e cheio de coisas que a ciência oficial prefere não comentar.
+
+Durante um fim de semana, a tripulação do Siren Tracker catalogou 7 espécies, georeferenciou 42 avistamentos, calibrou o sonar manualmente, devolveu a Merrow ao Mar Céltico e jogou o `appy.py` ao mar com honras!
+
+891 vidas salvas. A Merrow continua sendo o problema. O Locathah estava só passando, respeito.
+
+Não entre no mar sem o Siren Tracker.
+
+Na verdade, talvez não entre no mar.
+
+*— A Tripulação e as sereias que colaboraram com a catalogação*
