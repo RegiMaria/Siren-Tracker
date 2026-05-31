@@ -55,9 +55,13 @@ html,body,[class*="css"]{font-family:var(--font)!important}
 .note-teal{background:var(--teal);color:#fff}
 .note-lavender{background:#E1B7ED;color:var(--purple)}
 
-.species-table{width:100%;border-collapse:collapse}
+.species-table{width:100%;border-collapse:collapse;table-layout:fixed}
 .species-table th{background:#F2F5FA;padding:12px 18px;text-align:left;font-size:12px;font-weight:600;color:var(--text-muted);border-top:1px solid var(--border);border-bottom:1px solid var(--border)}
-.species-table td{padding:13px 18px;border-bottom:1px solid var(--border);font-size:13px}
+.species-table th:nth-child(1){width:22%}
+.species-table th:nth-child(2){width:14%}
+.species-table th:nth-child(3){width:20%}
+.species-table th:nth-child(4){width:44%}
+.species-table td{padding:14px 18px;border-bottom:1px solid var(--border);font-size:13px;vertical-align:middle}
 .species-table tr:last-child td{border-bottom:none}
 .species-table tr:hover td{background:#FAFBFF}
 
@@ -238,20 +242,6 @@ def topbar(pagina_ativa="dashboard"):
       <div class="nav">{nav_html}{locked}</div>
       <button class="btn-cad">Cadastre-se</button>
     </div>
-    <script>
-      (function(){{
-        function tick(){{
-          const n=new Date();
-          const s=String(n.getUTCHours()).padStart(2,'0')+':'+
-                  String(n.getUTCMinutes()).padStart(2,'0')+':'+
-                  String(n.getUTCSeconds()).padStart(2,'0')+' UTC';
-          const el=document.getElementById('utc');
-          if(el)el.textContent=s;
-          else setTimeout(tick,200);
-        }}
-        tick(); setInterval(tick,1000);
-      }})();
-    </script>
     """
 
 def sonar_html():
