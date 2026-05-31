@@ -1,0 +1,50 @@
+[
+  {"key": "merrow", "especie": "Merrow", "nome": "Iara do Nordeste", "risco": "alto", "local": "Mar Céltico", "lat": 51.5, "lon": -10.2, "intensidade": 47},
+  {"key": "merrow", "especie": "Merrow", "nome": "Iara do Nordeste", "risco": "alto", "local": "Atlântico Norte", "lat": 56.0, "lon": -12.0, "intensidade": 38},
+  {"key": "merrow", "especie": "Merrow", "nome": "Iara do Nordeste", "risco": "alto", "local": "Sul da Islândia", "lat": 60.5, "lon": -20.0, "intensidade": 29},
+  {"key": "merrow", "especie": "Merrow", "nome": "Iara do Nordeste", "risco": "alto", "local": "Golfo da Biscaia", "lat": 47.0, "lon": -8.0, "intensidade": 33},
+  {"key": "merrow", "especie": "Merrow", "nome": "Iara do Nordeste", "risco": "alto", "local": "Atlântico Nordeste", "lat": 53.0, "lon": -25.0, "intensidade": 21},
+  {"key": "merrow", "especie": "Merrow", "nome": "Iara do Nordeste", "risco": "alto", "local": "Atlântico Central-Norte", "lat": 45.0, "lon": -32.0, "intensidade": 18},
+
+  {"key": "selkies", "especie": "Selkie", "nome": "Tupi Profunda", "risco": "alto", "local": "Costa da Escócia", "lat": 57.8, "lon": -5.5, "intensidade": 25},
+  {"key": "selkies", "especie": "Selkie", "nome": "Tupi Profunda", "risco": "alto", "local": "Mar do Norte", "lat": 59.5, "lon": -1.0, "intensidade": 19},
+  {"key": "selkies", "especie": "Selkie", "nome": "Tupi Profunda", "risco": "alto", "local": "Águas da Islândia", "lat": 63.0, "lon": -19.0, "intensidade": 14},
+  {"key": "selkies", "especie": "Selkie", "nome": "Tupi Profunda", "risco": "alto", "local": "Mar da Noruega", "lat": 66.0, "lon": 5.0, "intensidade": 12},
+  {"key": "selkies", "especie": "Selkie", "nome": "Tupi Profunda", "risco": "alto", "local": "Mar da Irlanda", "lat": 54.5, "lon": -5.5, "intensidade": 17},
+  {"key": "selkies", "especie": "Selkie", "nome": "Tupi Profunda", "risco": "alto", "local": "Ilhas Shetland", "lat": 61.0, "lon": -2.0, "intensidade": 9},
+
+  {"key": "sirens", "especie": "Siren", "nome": "Abyssalis Salvador", "risco": "alto", "local": "Açores", "lat": 38.5, "lon": -28.7, "intensidade": 28},
+  {"key": "sirens", "especie": "Siren", "nome": "Abyssalis Salvador", "risco": "alto", "local": "Estreito da Sicília", "lat": 37.5, "lon": 13.0, "intensidade": 22},
+  {"key": "sirens", "especie": "Siren", "nome": "Abyssalis Salvador", "risco": "alto", "local": "Mediterrâneo Oriental", "lat": 34.5, "lon": 24.0, "intensidade": 18},
+  {"key": "sirens", "especie": "Siren", "nome": "Abyssalis Salvador", "risco": "alto", "local": "Estreito de Gibraltar", "lat": 35.9, "lon": -6.0, "intensidade": 24},
+  {"key": "sirens", "especie": "Siren", "nome": "Abyssalis Salvador", "risco": "alto", "local": "Caribe — Porto Rico", "lat": 18.5, "lon": -66.0, "intensidade": 15},
+  {"key": "sirens", "especie": "Siren", "nome": "Abyssalis Salvador", "risco": "alto", "local": "Atlântico — Oeste de Portugal", "lat": 40.0, "lon": -12.0, "intensidade": 13},
+
+  {"key": "rusalkas", "especie": "Rusalka", "nome": "Sereia de Recife", "risco": "medio", "local": "Mar Negro", "lat": 43.2, "lon": 33.0, "intensidade": 23},
+  {"key": "rusalkas", "especie": "Rusalka", "nome": "Sereia de Recife", "risco": "medio", "local": "Mar Negro Norte", "lat": 44.5, "lon": 36.0, "intensidade": 16},
+  {"key": "rusalkas", "especie": "Rusalka", "nome": "Sereia de Recife", "risco": "medio", "local": "Mar Báltico", "lat": 58.5, "lon": 20.0, "intensidade": 11},
+  {"key": "rusalkas", "especie": "Rusalka", "nome": "Sereia de Recife", "risco": "medio", "local": "Golfo da Finlândia", "lat": 60.0, "lon": 26.0, "intensidade": 8},
+  {"key": "rusalkas", "especie": "Rusalka", "nome": "Sereia de Recife", "risco": "medio", "local": "Mar de Azov", "lat": 46.0, "lon": 36.5, "intensidade": 10},
+  {"key": "rusalkas", "especie": "Rusalka", "nome": "Sereia de Recife", "risco": "medio", "local": "Bósforo", "lat": 41.2, "lon": 29.1, "intensidade": 7},
+
+  {"key": "handwerkskunst", "especie": "Handwerkskunst", "nome": "Lurca de Santos", "risco": "medio", "local": "Dorsal Mesoatlântica", "lat": 22.5, "lon": -43.8, "intensidade": 19},
+  {"key": "handwerkskunst", "especie": "Handwerkskunst", "nome": "Lurca de Santos", "risco": "medio", "local": "Dorsal Equatorial", "lat": 0.0, "lon": -25.0, "intensidade": 14},
+  {"key": "handwerkskunst", "especie": "Handwerkskunst", "nome": "Lurca de Santos", "risco": "medio", "local": "Atlântico Sul — Dorsal", "lat": -10.0, "lon": -14.0, "intensidade": 9},
+  {"key": "handwerkskunst", "especie": "Handwerkskunst", "nome": "Lurca de Santos", "risco": "medio", "local": "Atlântico Central", "lat": 15.0, "lon": -46.0, "intensidade": 11},
+  {"key": "handwerkskunst", "especie": "Handwerkskunst", "nome": "Lurca de Santos", "risco": "medio", "local": "Mediterrâneo Oriental profundo", "lat": 33.5, "lon": 28.0, "intensidade": 8},
+  {"key": "handwerkskunst", "especie": "Handwerkskunst", "nome": "Lurca de Santos", "risco": "medio", "local": "Atlântico Equatorial", "lat": 5.0, "lon": -34.0, "intensidade": 12},
+
+  {"key": "zorah", "especie": "Zorah", "nome": "Sereia das Palmas", "risco": "baixo", "local": "Caribe", "lat": 17.3, "lon": -64.8, "intensidade": 61},
+  {"key": "zorah", "especie": "Zorah", "nome": "Sereia das Palmas", "risco": "baixo", "local": "Pacífico Tropical Leste", "lat": 8.0, "lon": -125.0, "intensidade": 44},
+  {"key": "zorah", "especie": "Zorah", "nome": "Sereia das Palmas", "risco": "baixo", "local": "Índico Equatorial", "lat": -4.0, "lon": 78.0, "intensidade": 38},
+  {"key": "zorah", "especie": "Zorah", "nome": "Sereia das Palmas", "risco": "baixo", "local": "Pacífico Oeste — Micronésia", "lat": 7.0, "lon": 155.0, "intensidade": 33},
+  {"key": "zorah", "especie": "Zorah", "nome": "Sereia das Palmas", "risco": "baixo", "local": "Índico — Mascarenhas", "lat": -15.0, "lon": 58.0, "intensidade": 29},
+  {"key": "zorah", "especie": "Zorah", "nome": "Sereia das Palmas", "risco": "baixo", "local": "Pacífico Central", "lat": -2.0, "lon": -150.0, "intensidade": 26},
+
+  {"key": "locathah", "especie": "Locathah", "nome": "Sereia Gaúcha", "risco": "baixo", "local": "Cabo Verde", "lat": 15.1, "lon": -23.6, "intensidade": 34},
+  {"key": "locathah", "especie": "Locathah", "nome": "Sereia Gaúcha", "risco": "baixo", "local": "Golfo da Guiné", "lat": 2.0, "lon": 5.0, "intensidade": 27},
+  {"key": "locathah", "especie": "Locathah", "nome": "Sereia Gaúcha", "risco": "baixo", "local": "Golfo do México", "lat": 25.0, "lon": -90.0, "intensidade": 31},
+  {"key": "locathah", "especie": "Locathah", "nome": "Sereia Gaúcha", "risco": "baixo", "local": "Costa Africana Ocidental", "lat": -3.0, "lon": 8.0, "intensidade": 19},
+  {"key": "locathah", "especie": "Locathah", "nome": "Sereia Gaúcha", "risco": "baixo", "local": "Costa da Guiné", "lat": 9.0, "lon": -16.0, "intensidade": 22},
+  {"key": "locathah", "especie": "Locathah", "nome": "Sereia Gaúcha", "risco": "baixo", "local": "Pequenas Antilhas", "lat": 13.0, "lon": -59.0, "intensidade": 24}
+]
