@@ -24,7 +24,7 @@ venv\Scripts\activate      # Windows - Power Shell
 pip install -r requirements.txt
 
 # 4. Rode a aplicação
-streamlit run appy.py
+streamlit run app.py
 ```
 
 ---
@@ -33,7 +33,7 @@ streamlit run appy.py
 
 ```
 Siren-Tracker/
-├── appy.py              # Entrypoint Streamlit
+├── app.py              # Entrypoint Streamlit
 ├── style.py             # Estilos e helper UI
 ├── requirements.txt
 ├── data/
