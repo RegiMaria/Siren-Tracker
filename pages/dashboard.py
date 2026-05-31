@@ -9,8 +9,35 @@ DATA_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "sereias.json"
 with open(DATA_PATH, encoding="utf-8") as f:
     sereias = json.load(f)
 
+AVIST_PATH = os.path.join(os.path.dirname(__file__), "..", "data", "avistamentos.json")
+with open(AVIST_PATH, encoding="utf-8") as f:
+    avistamentos = json.load(f)
+
+def _dist_ponto_segmento(px, py, ax, ay, bx, by):
+    dx, dy = bx - ax, by - ay
+    if dx == 0 and dy == 0:
+        return ((px - ax) ** 2 + (py - ay) ** 2) ** 0.5
+    t = ((px - ax) * dx + (py - ay) * dy) / (dx * dx + dy * dy)
+    t = max(0.0, min(1.0, t))
+    cx, cy = ax + t * dx, ay + t * dy
+    return ((px - cx) ** 2 + (py - cy) ** 2) ** 0.5
+
+def _na_rota_pontos(waypoints, corredor=6.0):
+    resultado = []
+    for a in avistamentos:
+        for i in range(len(waypoints) - 1):
+            d = _dist_ponto_segmento(
+                a["lat"], a["lon"],
+                waypoints[i][0], waypoints[i][1],
+                waypoints[i+1][0], waypoints[i+1][1],
+            )
+            if d <= corredor:
+                resultado.append(a)
+                break
+    return resultado
+
 WORLD_MAP_SVG = """
-<div style="position:relative;height:340px;overflow:hidden;background:#0d3352;border-radius:0">
+<div class="world-map-svg" style="position:relative;height:340px;overflow:hidden;background:#0d3352;border-radius:0">
   <svg width="100%" height="100%" viewBox="0 0 600 340" style="position:absolute;inset:0">
     <rect width="600" height="340" fill="#0d3352"/>
     <line x1="0" y1="170" x2="600" y2="170" stroke="rgba(255,255,255,.04)" stroke-width=".5"/>
@@ -82,14 +109,6 @@ WORLD_MAP_SVG = """
   <div style="display:flex;align-items:center;gap:6px;font-size:12px;color:var(--text-muted)"><div style="width:10px;height:10px;border-radius:50%;background:#2EB8AC"></div>Baixo Risco</div>
 </div>"""
 
-def sereias_proximas(lat_o, lon_o, lat_d, lon_d, margem=4.0):
-    resultado = []
-    for s in sereias:
-        lat_s, lon_s = s["latitude"], s["longitude"]
-        if (min(lat_o,lat_d)-margem <= lat_s <= max(lat_o,lat_d)+margem and
-            min(lon_o,lon_d)-margem <= lon_s <= max(lon_o,lon_d)+margem):
-            resultado.append(s)
-    return resultado
 
 def run():
     st.markdown(STYLE, unsafe_allow_html=True)
@@ -113,135 +132,143 @@ def run():
     with col1:
         st.markdown(f"""
         <div class="card">
-          <div class="card-header"><span class="card-title">Sereias Mapeadas no Mundo</span></div>
+          <div class="card-header" style="padding-top:28px"><span class="card-title">Sereias Mapeadas no Mundo</span></div>
           {WORLD_MAP_SVG}
         </div>""", unsafe_allow_html=True)
 
-    # MAPA DIREITO — Folium real com rota pré-calculada (nosso segredinho)
+    # MAPA DIREITO — Folium real com rota e avistamentos reais
     with col2:
-        st.markdown("""
-        <div class="card">
-          <div class="card-header"><span class="card-title">Análise de Rota Marítima</span></div>
-        """, unsafe_allow_html=True)
+        st.markdown(
+            '<style>'
+            '[data-testid="stColumn"]:has(#rota-card-anchor)>[data-testid="stVerticalBlock"]{'
+            'background:#FFFFFF!important;border:1px solid #DAE3F8;border-radius:12px;'
+            'padding:0 16px 27px!important;box-sizing:border-box}'
+            '</style>'
+            '<span id="rota-card-anchor" style="display:none"></span>',
+            unsafe_allow_html=True,
+        )
+        st.markdown('<div class="card-header" style="margin:-4px 0 6px"><span class="card-title">Análise de Rota Marítima</span></div>', unsafe_allow_html=True)
 
-        # inputs dentro do card
+        opcoes_portos = sorted(PORTOS.keys(), key=lambda k: PORTOS[k]["nome"])
+        labels_portos = {k: PORTOS[k]["nome"] for k in opcoes_portos}
+
         c_o, c_d, c_b = st.columns([2, 2, 1])
         with c_o:
-            origem_txt = st.text_input("Origem", value="Santos, BR",
-                                       placeholder="Ex: Santos", key="dash_origem",
-                                       label_visibility="collapsed")
+            origem_key = st.selectbox(
+                "Origem", options=opcoes_portos,
+                format_func=lambda k: labels_portos[k],
+                index=opcoes_portos.index("santos") if "santos" in opcoes_portos else 0,
+                key="dash_origem",
+                label_visibility="collapsed",
+            )
         with c_d:
-            destino_txt = st.text_input("Destino", value="Lisboa, PT",
-                                        placeholder="Ex: Lisboa", key="dash_destino",
-                                        label_visibility="collapsed")
+            destino_key = st.selectbox(
+                "Destino", options=opcoes_portos,
+                format_func=lambda k: labels_portos[k],
+                index=opcoes_portos.index("lisboa") if "lisboa" in opcoes_portos else 1,
+                key="dash_destino",
+                label_visibility="collapsed",
+            )
         with c_b:
             calcular = st.button("Analisar 🧭", use_container_width=True, key="dash_calc")
 
+        porto_o = PORTOS.get(origem_key)
+        porto_d = PORTOS.get(destino_key)
         na_rota = []
-        porto_o = buscar_porto(origem_txt) if origem_txt else None
-        porto_d = buscar_porto(destino_txt) if destino_txt else None
+        pontos = None
 
-        # mapa Folium compacto
         mapa = folium.Map(
             location=[-5.0, -25.0],
             zoom_start=3,
             tiles="CartoDB dark_matter",
         )
 
-        if calcular and porto_o and porto_d:
+        if porto_o and porto_d:
             lat_o, lon_o = porto_o["lat"], porto_o["lon"]
             lat_d, lon_d = porto_d["lat"], porto_d["lon"]
 
-            # rota com curva oceânica
             mid_lat = (lat_o + lat_d) / 2
             mid_lon = (lon_o + lon_d) / 2 - 10
-            pontos = [[lat_o,lon_o],[( lat_o+mid_lat)/2,(lon_o+mid_lon)/2],[mid_lat,mid_lon],[(mid_lat+lat_d)/2,(mid_lon+lon_d)/2],[lat_d,lon_d]]
+            pontos = [
+                [lat_o, lon_o],
+                [(lat_o + mid_lat) / 2, (lon_o + mid_lon) / 2],
+                [mid_lat, mid_lon],
+                [(mid_lat + lat_d) / 2, (mid_lon + lon_d) / 2],
+                [lat_d, lon_d],
+            ]
 
             folium.PolyLine(pontos, color="#2EB8AC", weight=2.5,
-                            dash_array="8 5", opacity=0.9,
+                            dash_array="8 5", opacity=0.9 if calcular else 0.7,
                             tooltip=f"{porto_o['nome']} → {porto_d['nome']}").add_to(mapa)
 
-            folium.Marker([lat_o,lon_o], tooltip=f"🚢 {porto_o['nome']}",
+            folium.Marker([lat_o, lon_o], tooltip=f"🚢 {porto_o['nome']}",
                           icon=folium.Icon(color="blue", icon="home", prefix="fa")).add_to(mapa)
-            folium.Marker([lat_d,lon_d], tooltip=f"🏁 {porto_d['nome']}",
+            folium.Marker([lat_d, lon_d], tooltip=f"🏁 {porto_d['nome']}",
                           icon=folium.Icon(color="red", icon="flag", prefix="fa")).add_to(mapa)
 
-            na_rota = sereias_proximas(lat_o, lon_o, lat_d, lon_d)
-            mapa.fit_bounds([[lat_o,lon_o],[lat_d,lon_d]])
+            na_rota = _na_rota_pontos(pontos)
+            mapa.fit_bounds([[lat_o, lon_o], [lat_d, lon_d]])
 
-        elif not calcular and porto_o and porto_d:
-            # mostra rota padrão Santos→Lisboa ao carregar
-            lat_o, lon_o = porto_o["lat"], porto_o["lon"]
-            lat_d, lon_d = porto_d["lat"], porto_d["lon"]
-            mid_lat = (lat_o+lat_d)/2
-            mid_lon = (lon_o+lon_d)/2 - 10
-            pontos = [[lat_o,lon_o],[(lat_o+mid_lat)/2,(lon_o+mid_lon)/2],[mid_lat,mid_lon],[(mid_lat+lat_d)/2,(mid_lon+lon_d)/2],[lat_d,lon_d]]
-            folium.PolyLine(pontos, color="#2EB8AC", weight=2.5, dash_array="8 5", opacity=0.7).add_to(mapa)
-            folium.Marker([lat_o,lon_o], tooltip=f"🚢 {porto_o['nome']}",
-                          icon=folium.Icon(color="blue", icon="home", prefix="fa")).add_to(mapa)
-            folium.Marker([lat_d,lon_d], tooltip=f"🏁 {porto_d['nome']}",
-                          icon=folium.Icon(color="red", icon="flag", prefix="fa")).add_to(mapa)
-            na_rota = sereias_proximas(lat_o, lon_o, lat_d, lon_d)
-            mapa.fit_bounds([[lat_o,lon_o],[lat_d,lon_d]])
-
-        # pinta sereias
-        for s in sereias:
-            na = s in na_rota
+        for a in avistamentos:
+            na = a in na_rota
             folium.CircleMarker(
-                location=[s["latitude"], s["longitude"]],
-                radius=11 if na else 6,
-                color="white" if na else CORES[s["risco"]],
+                location=[a["lat"], a["lon"]],
+                radius=10 if na else 5,
+                color="white" if na else CORES[a["risco"]],
                 weight=2 if na else 1,
                 fill=True,
-                fill_color=CORES[s["risco"]],
+                fill_color=CORES[a["risco"]],
                 fill_opacity=0.95 if na else 0.2,
-                tooltip=f"{'⚠️ ' if na else ''}{s['nome']} ({s['especie']})",
+                tooltip=f"{'⚠️ ' if na else ''}{a.get('especie', '')} — {LABELS[a['risco']]}",
             ).add_to(mapa)
             if na:
                 folium.CircleMarker(
-                    location=[s["latitude"], s["longitude"]],
-                    radius=18, color=CORES[s["risco"]],
+                    location=[a["lat"], a["lon"]],
+                    radius=16, color=CORES[a["risco"]],
                     weight=1.5, fill=False, opacity=0.35,
                 ).add_to(mapa)
 
-        st_folium(mapa, width="100%", height=340, returned_objects=[])
+        st_folium(mapa, use_container_width=True, height=320, returned_objects=[])
 
-        if calcular:
-            if not porto_o:
-                st.error(f"'{origem_txt}' não reconhecido pelo sistema de inteligência naval. Tente: Santos, Recife, Lisboa, Miami, Rotterdam, Luanda...")
-            elif not porto_d:
-                st.error(f"'{destino_txt}' não reconhecido. Tente: Santos, Recife, Lisboa, Miami, Rotterdam, Luanda...")
-
-        # resumo de risco abaixo do mapa
         if na_rota:
-            alto  = sum(1 for s in na_rota if s["risco"]=="alto")
-            medio = sum(1 for s in na_rota if s["risco"]=="medio")
-            risco_pct = min(int((alto*70+medio*40)/max(len(na_rota),1)),95)
-            cor_g = "#A43955" if risco_pct>60 else "#F39237"
+            alto  = sum(1 for a in na_rota if a["risco"] == "alto")
+            medio = sum(1 for a in na_rota if a["risco"] == "medio")
+            risco_pct = min(int((alto * 70 + medio * 40) / max(len(na_rota), 1)), 95)
+            cor_g = "#A43955" if risco_pct > 60 else "#F39237"
             nome_rota = f"{porto_o['nome'].split(',')[0]} → {porto_d['nome'].split(',')[0]}" if porto_o and porto_d else ""
 
+            rota_key = f"dash_{origem_key}_{destino_key}"
+            if f"naufragios_{rota_key}" not in st.session_state:
+                st.session_state[f"naufragios_{rota_key}"] = random.randint(2, 5)
+            if f"risco_offset_{rota_key}" not in st.session_state:
+                st.session_state[f"risco_offset_{rota_key}"] = random.randint(10, 25)
+            if f"reducao_{rota_key}" not in st.session_state:
+                st.session_state[f"reducao_{rota_key}"] = random.randint(32, 45)
+            _naufragios = st.session_state[f"naufragios_{rota_key}"]
+            _risco_offset = st.session_state[f"risco_offset_{rota_key}"]
+            _reducao = st.session_state[f"reducao_{rota_key}"]
+
             st.markdown(f"""
-            <div style="padding:14px 16px;border-top:1px solid var(--border)">
+            <div style="padding:10px 2px 4px;border-top:1px solid #E8EEF8">
               <div style="font-size:12px;font-weight:500;color:var(--text-muted);margin-bottom:10px">
                 Probabilidade de risco: <strong style="color:var(--text-primary)">{nome_rota}</strong>
               </div>
               <div style="display:flex;gap:18px;align-items:flex-start;">
                 {gauge_html(risco_pct, cor_g, 'Risco Merrow')}
-                {gauge_html(min(risco_pct+random.randint(10,25),95), '#2EB8AC', 'Risco Geral Oceânico')}
+                {gauge_html(min(risco_pct + _risco_offset, 95), '#2EB8AC', 'Risco Geral Oceânico')}
                 <div style="flex:1;font-size:11px;color:var(--text-muted);line-height:1.7;border-left:1px solid var(--border);padding-left:14px">
                   <strong style="color:var(--text-primary);display:block;margin-bottom:5px;font-size:12px">⚠ Inteligência Oceânica</strong>
                   <div class="risk-factor"><span class="rfd" style="background:#A43955"></span>Lua cheia — atividade Siren +18%</div>
                   <div class="risk-factor"><span class="rfd" style="background:#A43955"></span>Temperatura: 24°C (ideal p/ Merrow)</div>
-                  <div class="risk-factor"><span class="rfd" style="background:#F39237"></span>{random.randint(2,5)} naufrágios históricos na rota</div>
+                  <div class="risk-factor"><span class="rfd" style="background:#F39237"></span>{_naufragios} naufrágios históricos na rota</div>
                   <div class="risk-factor"><span class="rfd" style="background:#2EB8AC"></span>Ressonância mágica: moderada</div>
                   <div class="alt-route">
                     <div class="alt-label">🧭 Rota alternativa sugerida</div>
-                    Rota via sul tem {random.randint(32,45)}% menos risco de encontro hostil.
+                    Rota via sul tem {_reducao}% menos risco de encontro hostil.
                   </div>
                 </div>
               </div>
             </div>""", unsafe_allow_html=True)
-        st.markdown("</div>", unsafe_allow_html=True)
 
     # ── tabela de espécies (montada numa string única p/ não quebrar) ─────────
     linhas = ""
