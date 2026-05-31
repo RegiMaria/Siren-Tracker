@@ -243,21 +243,29 @@ def run():
             </div>""", unsafe_allow_html=True)
         st.markdown("</div>", unsafe_allow_html=True)
 
-    # ── tabela de espécies ────────────────────────────────────────────────────
-    st.markdown("""
-    <div class="card" style="margin-top:4px">
-      <div class="card-header"><span class="card-title">Categorização das Sereias</span></div>
-      <table class="species-table" style="margin-top:6px">
-        <thead><tr><th>Raça</th><th>Risco</th><th>Tipo de Ataque</th><th>Ponto de Atenção</th></tr></thead>
-        <tbody>""", unsafe_allow_html=True)
-
+    # ── tabela de espécies (montada numa string única p/ não quebrar) ─────────
+    linhas = ""
     for s in sereias:
-        st.markdown(f"""
-        <tr>
+        linhas += f"""<tr>
           <td><b>{s['emoji']} {s['especie']}</b></td>
           <td><span class="risk-badge {s['risco_class']}">{s['risco_label']}</span></td>
           <td>{s['agressividade']}</td>
-          <td><span class="note-btn {s['nota_class']}">{s['nota']}</span></td>
-        </tr>""", unsafe_allow_html=True)
+          <td style="text-align:right"><span class="note-btn {s['nota_class']}">{s['nota']}</span></td>
+        </tr>"""
 
-    st.markdown("</tbody></table></div></div>", unsafe_allow_html=True)
+    st.markdown(f"""
+    <div class="card" style="margin-top:4px">
+      <div class="card-header"><span class="card-title">Categorização das Sereias</span></div>
+      <table class="species-table" style="margin-top:6px">
+        <thead>
+          <tr>
+            <th>Raça</th>
+            <th>Risco</th>
+            <th>Tipo de Ataque</th>
+            <th style="text-align:right">Ponto de Atenção</th>
+          </tr>
+        </thead>
+        <tbody>{linhas}</tbody>
+      </table>
+    </div>
+    """, unsafe_allow_html=True)
