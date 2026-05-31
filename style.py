@@ -217,7 +217,9 @@ def gauge_html(pct, color, label):
     </div>"""
 
 def topbar(pagina_ativa="dashboard"):
-    pages = [
+    import streamlit as _st
+
+    PAGES = [
         ("dashboard",    "🗺️ Dashboard"),
         ("mapa",         "📍 Mapa"),
         ("intel",        "📡 Inteligência"),
@@ -225,24 +227,64 @@ def topbar(pagina_ativa="dashboard"):
         ("routes",       "🧭 Rotas"),
         ("reports",      "📋 Relatórios"),
     ]
-    nav_html = ""
-    for key, label in pages:
-        ativo = "active" if key == pagina_ativa else ""
-        nav_html += f'<a class="{ativo}" href="/{key}" target="_self">{label}</a>'
 
-    locked = '<a class="locked">🔒 Detector</a><a class="locked">🔒 Avistamentos</a>'
-
-    return f"""
+    _st.markdown(f"""
     <div class="topbar">
       <div class="brand">
         {LOGO_SVG}
         Siren Tracker
         <span class="brand-sub">NAVAL INTELLIGENCE v2.4</span>
       </div>
-      <div class="nav">{nav_html}{locked}</div>
-      <button class="btn-cad">Cadastre-se</button>
     </div>
-    """
+    <style>
+    /* botões de nav parecem links */
+    div[data-testid="stHorizontalBlock"]{{
+        gap:0!important;
+        background:var(--surface);
+        border-bottom:1px solid var(--border);
+        padding:4px 56px!important;
+        margin-top:-4px!important;
+    }}
+    div[data-testid="stHorizontalBlock"] > div[data-testid="column"]{{
+        padding:0!important;flex:0 0 auto!important;width:auto!important;
+    }}
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"]{{
+        background:transparent!important;border:none!important;
+        box-shadow:none!important;padding:7px 13px!important;
+        border-radius:8px!important;font-size:13px!important;
+        font-weight:500!important;color:#606060!important;
+        white-space:nowrap!important;
+        transform:none!important;transition:background .15s,color .15s!important;
+    }}
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"]:hover{{
+        background:#F2F5FA!important;color:#0B3954!important;
+        transform:none!important;box-shadow:none!important;
+    }}
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"]:active,
+    div[data-testid="stHorizontalBlock"] [data-testid="baseButton-secondary"]:focus{{
+        transform:none!important;box-shadow:none!important;outline:none!important;
+    }}
+    .nav-ativo [data-testid="baseButton-secondary"]{{
+        background:#EEF2FF!important;color:#4379EE!important;
+    }}
+    </style>
+    """, unsafe_allow_html=True)
+
+    cols = _st.columns(len(PAGES) + 2)
+    for i, (key, label) in enumerate(PAGES):
+        with cols[i]:
+            if key == pagina_ativa:
+                _st.markdown('<div class="nav-ativo">', unsafe_allow_html=True)
+            if _st.button(label, key=f"_nav_{key}"):
+                _st.session_state["_nav_target"] = key
+                _st.rerun()
+            if key == pagina_ativa:
+                _st.markdown("</div>", unsafe_allow_html=True)
+    with cols[len(PAGES)]:
+        _st.button("🔒 Detector", key="_nav_locked_1", disabled=True)
+    with cols[len(PAGES) + 1]:
+        _st.button("🔒 Avistamentos", key="_nav_locked_2", disabled=True)
+
 
 def sonar_html():
     return """
