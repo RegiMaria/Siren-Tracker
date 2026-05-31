@@ -228,7 +228,11 @@ def topbar(pagina_ativa="dashboard"):
     nav_html = ""
     for key, label in pages:
         ativo = "active" if key == pagina_ativa else ""
-        nav_html += f'<a class="{ativo}" href="/{key}" target="_self">{label}</a>'
+
+        href = "/" if key == "dashboard" else f"/{key}"
+
+        nav_html += f'<a class="{ativo}" href="{href}" target="_self">{label}</a>'
+      
 
     locked = '<a class="locked">🔒 Detector</a><a class="locked">🔒 Avistamentos</a>'
 
