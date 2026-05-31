@@ -12,78 +12,84 @@ def run():
     st.markdown(topbar("encyclopedia"), unsafe_allow_html=True)
     st.markdown('<div class="content">', unsafe_allow_html=True)
     st.markdown('<div class="page-title">Enciclopédia de Ameaças</div>', unsafe_allow_html=True)
-    st.markdown('<p style="color:var(--text-muted);font-size:14px;margin-top:-14px;margin-bottom:20px">Base de dados de inteligência classificada — 7 espécies catalogadas</p>', unsafe_allow_html=True)
+    st.markdown('<p style="color:#606060;font-size:14px;margin-top:-14px;margin-bottom:20px">Base de dados de inteligência classificada — 7 espécies catalogadas</p>', unsafe_allow_html=True)
 
-    especie_sel = st.selectbox(
-        "Selecione uma espécie para ver a ficha completa",
-        options=[""] + [s["especie"] for s in sereias],
-        format_func=lambda x: "-- Escolha uma espécie --" if x == "" else f"{next((s['emoji'] for s in sereias if s['especie']==x),'')}{x}",
-    )
+    # ── detecta clique via query param ────────────────────────────────────────
+    enc_key = st.query_params.get("enc", "")
+    sel = next((s for s in sereias if s["key"] == enc_key), None)
 
-    if especie_sel:
-        s = next((x for x in sereias if x["especie"] == especie_sel), None)
-        if s:
-            cor = s["color"]
-            bg  = s["bg"]
-            pct = s["ameaca_pct"]
-            rc  = s["risco_class"]
-            st.markdown(f"""
-            <div class="card" style="margin-bottom:20px">
-              <div style="padding:22px;border-bottom:1px solid var(--border);display:flex;align-items:flex-start;gap:18px;background:{bg}">
-                <div style="width:90px;height:90px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;background:{cor}22;border:2px solid {cor}33;flex-shrink:0">{s['emoji']}</div>
-                <div style="flex:1">
-                  <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
-                    <h2 style="font-size:22px;font-weight:700;color:var(--text-primary)">{s['especie']}</h2>
-                    <span class="risk-badge {rc}">{s['risco_label']}</span>
-                  </div>
-                  <div style="font-size:13px;color:var(--text-muted);margin-bottom:8px">{s['habitat']}</div>
-                  <span class="chip">Profundidade: {s['profundidade']}</span>
-                  <span class="chip">Freq.: {s['freq']}</span>
-                  <div style="margin-top:8px">
-                    <div style="font-size:10px;color:var(--text-muted);margin-bottom:3px">NÍVEL DE AMEAÇA</div>
-                    <div class="threat-meter"><div class="threat-fill" style="width:{pct}%;background:{cor}"></div></div>
-                  </div>
-                </div>
+    # ── ficha detalhada ───────────────────────────────────────────────────────
+    if sel:
+        s = sel
+        cor, bg, pct, rc = s["color"], s["bg"], s["ameaca_pct"], s["risco_class"]
+
+        _, col_fechar = st.columns([15, 1])
+        with col_fechar:
+            if st.button("× Fechar", use_container_width=True):
+                del st.query_params["enc"]
+                st.rerun()
+
+        st.markdown(f"""
+        <div class="card" style="margin-bottom:20px">
+          <div style="padding:22px;border-bottom:1px solid #DAE3F8;display:flex;align-items:flex-start;gap:18px;background:{bg}">
+            <div style="width:90px;height:90px;border-radius:12px;display:flex;align-items:center;justify-content:center;font-size:48px;background:{cor}22;border:2px solid {cor}33;flex-shrink:0">{s['emoji']}</div>
+            <div style="flex:1">
+              <div style="display:flex;align-items:center;gap:10px;margin-bottom:6px">
+                <h2 style="font-size:24px;font-weight:700;color:#0B1C33">{s['especie']}</h2>
+                <span class="risk-badge {rc}">{s['risco_label']}</span>
               </div>
-              <div style="padding:20px;display:grid;grid-template-columns:1fr 1fr;gap:20px">
-                <div>
-                  <div class="spec-section-title">Biologia e Comportamento</div>
-                  <div class="spec-field"><span class="spec-field-key">Alimentação</span><span class="spec-field-val">{s['alimentacao']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Social</span><span class="spec-field-val">{s['social']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Migração</span><span class="spec-field-val">{s['migracao']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Método de caça</span><span class="spec-field-val">{s['caca']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Agressividade</span><span class="spec-field-val">{s['agressividade']}</span></div>
-                  <div class="spec-section-title">Inteligência Tática</div>
-                  <div class="spec-field"><span class="spec-field-key">Ataque</span><span class="spec-field-val">{s['ataque']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Fraquezas</span><span class="spec-field-val">{s['fraquezas']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Regiões</span><span class="spec-field-val">{s['regioes']}</span></div>
-                </div>
-                <div>
-                  <div class="spec-section-title">Risco por Tipo de Embarcação</div>
-                  <div class="spec-field"><span class="spec-field-key">Navios de carga</span><span class="spec-field-val" style="color:{cor}">{s['risco_carga']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Pescadores</span><span class="spec-field-val" style="color:{cor}">{s['risco_pescadores']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Militares</span><span class="spec-field-val" style="color:{cor}">{s['risco_militar']}</span></div>
-                  <div class="spec-field"><span class="spec-field-key">Incidentes</span><span class="spec-field-val">{s['incidentes']}</span></div>
-                  <div class="spec-section-title">Registro de Inteligência</div>
-                  <div class="spec-lore">{s['lore']}</div>
-                </div>
+              <div style="font-size:14px;color:#606060;margin-bottom:8px">{s['habitat']}</div>
+              <span class="chip">Profundidade: {s['profundidade']}</span>
+              <span class="chip">Freq.: {s['freq']}</span>
+              <div style="margin-top:8px">
+                <div style="font-size:11px;color:#606060;margin-bottom:3px">NÍVEL DE AMEAÇA GERAL</div>
+                <div class="threat-meter"><div class="threat-fill" style="width:{pct}%;background:{cor}"></div></div>
               </div>
             </div>
-          </div>""", unsafe_allow_html=True)
-
-    st.markdown('<div class="enc-grid">', unsafe_allow_html=True)
-    for s in sereias:
-        rc = "tag-high" if s["risco"]=="alto" else "tag-med" if s["risco"]=="medio" else "tag-low"
-        st.markdown(f"""
-        <div class="spec-card">
-          <div class="spec-card-banner" style="background:{s['bg']}">
-            <span>{s['emoji']}</span>
-            <div style="position:absolute;top:7px;right:7px"><span class="spec-tag {rc}">{s['risco_label']}</span></div>
           </div>
-          <div class="spec-card-body">
-            <div class="spec-card-name">{s['especie']}</div>
-            <div style="font-size:12px;color:var(--text-muted);margin-bottom:8px">{s['habitat'].split(',')[0]}</div>
-            <span class="spec-tag" style="background:#EFF6FF;color:#1a6bb5">Selecione acima ↑</span>
+          <div style="padding:24px;display:grid;grid-template-columns:1fr 1fr;gap:24px">
+            <div>
+              <div class="spec-section-title">Biologia e Comportamento</div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Alimentação</span><span class="spec-field-val" style="font-size:14px">{s['alimentacao']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Comportamento social</span><span class="spec-field-val" style="font-size:14px">{s['social']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Migração</span><span class="spec-field-val" style="font-size:14px">{s['migracao']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Método de caça</span><span class="spec-field-val" style="font-size:14px">{s['caca']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Agressividade</span><span class="spec-field-val" style="font-size:14px">{s['agressividade']}</span></div>
+              <div class="spec-section-title" style="margin-top:18px">Inteligência Tática</div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Método de ataque</span><span class="spec-field-val" style="font-size:14px">{s['ataque']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Fraquezas conhecidas</span><span class="spec-field-val" style="font-size:14px">{s['fraquezas']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Regiões confirmadas</span><span class="spec-field-val" style="font-size:14px">{s['regioes']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Frequência de avistamento</span><span class="spec-field-val" style="font-size:14px">{s['freq']}</span></div>
+            </div>
+            <div>
+              <div class="spec-section-title">Avaliação de Risco por Tipo de Embarcação</div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Navios de carga</span><span class="spec-field-val" style="font-size:14px;color:{cor}">{s['risco_carga']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Pescadores</span><span class="spec-field-val" style="font-size:14px;color:{cor}">{s['risco_pescadores']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Embarcações militares</span><span class="spec-field-val" style="font-size:14px;color:{cor}">{s['risco_militar']}</span></div>
+              <div class="spec-field"><span class="spec-field-key" style="font-size:14px">Incidentes documentados</span><span class="spec-field-val" style="font-size:14px">{s['incidentes']}</span></div>
+              <div class="spec-section-title" style="margin-top:18px">Registro de Inteligência</div>
+              <div class="spec-lore" style="font-size:14px;line-height:1.8">{s['lore']}</div>
+            </div>
           </div>
         </div>""", unsafe_allow_html=True)
-    st.markdown("</div></div>", unsafe_allow_html=True)
+
+    # ── grid de cards clicáveis ───────────────────────────────────────────────
+    cols = st.columns(3)
+    for i, s in enumerate(sereias):
+        rc = "tag-high" if s["risco"]=="alto" else "tag-med" if s["risco"]=="medio" else "tag-low"
+        with cols[i % 3]:
+            st.markdown(f"""
+            <a href="?enc={s['key']}" target="_self" style="text-decoration:none;color:inherit">
+            <div class="spec-card" style="cursor:pointer;margin-bottom:16px">
+              <div class="spec-card-banner" style="background:{s['bg']}">
+                <span style="font-size:52px">{s['emoji']}</span>
+                <div style="position:absolute;top:10px;right:10px"><span class="spec-tag {rc}">{s['risco_label']}</span></div>
+              </div>
+              <div class="spec-card-body">
+                <div class="spec-card-name">{s['especie']}</div>
+                <div style="font-size:12px;color:#606060;margin-bottom:8px">{s['habitat'].split(',')[0]}</div>
+              </div>
+            </div>
+            </a>""", unsafe_allow_html=True)
+
+    st.markdown("</div>", unsafe_allow_html=True)
